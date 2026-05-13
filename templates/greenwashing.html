@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>永續報告書漂綠偵測</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/greenwashing.css') }}">
+</head>
+
+<body>
+
+<section class="greenwashing-page">
+
+    <div class="gw-container">
+
+        <a href="/" class="back-link">← 返回首頁</a>
+
+        <div class="gw-header">
+            <h1>永續報告書漂綠偵測</h1>
+            <p>
+                上傳企業永續報告書 PDF，系統會使用 NLP 模型分析報告中的永續承諾、
+                量化證據、可信揭露與潛在漂綠風險。
+            </p>
+        </div>
+
+        <!-- 上傳 PDF 區塊 -->
+        <div class="upload-card">
+            <form method="POST" enctype="multipart/form-data">
+
+                <label class="upload-label">上傳永續報告書 PDF</label>
+
+                <input
+                    type="file"
+                    name="report_file"
+                    accept=".pdf"
+                    required
+                >
+
+                <button type="submit" class="analyze-btn">
+                    開始分析漂綠風險
+                </button>
+
+            </form>
+        </div>
+
+        <!-- 錯誤訊息 -->
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- 分析結果 -->
+        {% if result %}
+        <div class="result-section">
+
+            <h2>分析結果</h2>
+
+            <div class="summary-card">
+
+                <p class="filename">
+                    檔案名稱：{{ result.filename }}
+                </p>
+
+                <div class="score-main">
+                    <div>
+                        <span class="score-label">整體漂綠風險分數</span>
+                        <h3>{{ result.summary.report_greenwashing_score }} / 100</h3>
+                    </div>
+
+                    <div class="risk-badge">
+                        {{ result.summary.report_level }}
+                    </div>
+                </div>
+
+                <p class="summary-reason">
+                    {{ result.summary.summary_reason }}
+                </p>
+
+            </div>
+
+            <!-- 指標卡片 -->
+            <div class="metric-grid">
+
+                <div class="metric-card">
+                    <h4>分析段落數</h4>
+                    <p>{{ result.summary.n_chunks }}</p>
+                </div>
+
+                <div class="metric-card">
+                    <h4>平均承諾分數</h4>
+                    <p>{{ result.summary.avg_commitment_score }}</p>
+                </div>
+
+                <div class="metric-card">
+                    <h4>平均證據分數</h4>
+                    <p>{{ result.summary.avg_evidence_score }}</p>
+                </div>
+
+                <div class="metric-card">
+                    <h4>平均可信度分數</h4>
+                    <p>{{ result.summary.avg_credibility_score }}</p>
+                </div>
+
+                <div class="metric-card">
+                    <h4>平均空泛宣傳分數</h4>
+                    <p>{{ result.summary.avg_vague_claim_score }}</p>
+                </div>
+
+                <div class="metric-card">
+                    <h4>最高段落風險</h4>
+                    <p>{{ result.summary.max_greenwashing_risk }}</p>
+                </div>
+
+            </div>
+
+            <!-- 最高風險段落 -->
+            <div class="top-risk-card">
+
+                <h3>最高風險段落</h3>
+
+                <div class="risk-score-line">
+                    風險分數：{{ result.summary.top_risk_score }}
+                    ｜ 風險等級：{{ result.summary.top_risk_level }}
+                </div>
+
+                <p class="risk-explanation">
+                    {{ result.summary.top_risk_explanation }}
+                </p>
+
+                <blockquote>
+                    {{ result.summary.top_risk_text }}
+                </blockquote>
+
+            </div>
+
+            <!-- 前 5 個高風險段落 -->
+            <div class="chunks-section">
+
+                <h3>前 5 個高風險段落</h3>
+
+                {% for chunk in result.top_chunks %}
+                <div class="chunk-card">
+
+                    <div class="chunk-header">
+                        <strong>段落 {{ chunk.chunk_id }}</strong>
+                        <span>
+                            {{ chunk.risk_level }}
+                            ｜ {{ "%.2f"|format(chunk.greenwashing_risk) }}
+                        </span>
+                    </div>
+
+                    <p class="chunk-explanation">
+                        {{ chunk.explanation }}
+                    </p>
+
+                    <p class="chunk-text">
+                        {{ chunk.text }}
+                    </p>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+</section>
+
+</body>
+</html>

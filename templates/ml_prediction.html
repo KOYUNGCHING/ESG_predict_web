@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>機器學習預測｜ESG 與未來 ROA</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ml_prediction.css') }}">
+</head>
+
+<body>
+
+<section class="ml-page">
+
+    <div class="ml-container">
+
+        <a href="/" class="back-link">← 返回首頁</a>
+
+        <div class="ml-header">
+            <h1>機器學習預測</h1>
+            <p>
+                輸入企業 ESG 分數、E/S/G 構面分數、公司規模與前一期 ROA，
+                系統會使用訓練好的機器學習模型預測企業未來 ROA。
+            </p>
+        </div>
+
+        <div class="ml-form-card">
+            <form method="POST">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>TESG 分數</label>
+                        <input type="number" step="0.01" name="tesg_score" placeholder="例如：60" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>環境構面分數 E</label>
+                        <input type="number" step="0.01" name="env_score" placeholder="例如：65" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>社會構面分數 S</label>
+                        <input type="number" step="0.01" name="social_score" placeholder="例如：70" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>公司治理構面分數 G</label>
+                        <input type="number" step="0.01" name="gov_score" placeholder="例如：55" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>公司規模 / 平均市值</label>
+                        <input type="number" step="1" name="market_value" placeholder="例如：1000000000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>前一期 ROA</label>
+                        <input type="number" step="0.0001" name="roa_lag" placeholder="例如：2.5" required>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="predict-btn">開始預測未來 ROA</button>
+
+            </form>
+        </div>
+
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if result %}
+        <div class="ml-result-section">
+
+            <h2>預測結果</h2>
+
+            <div class="ml-summary-card">
+                <span class="score-label">預測未來 ROA</span>
+                <h3>{{ result.predicted_roa }}</h3>
+
+                <div class="risk-badge">
+                    {{ result.level }}
+                </div>
+
+                <p class="summary-reason">
+                    {{ result.conclusion }}
+                </p>
+            </div>
+
+            <div class="ml-explain-card">
+                <h3>模型判斷原因</h3>
+
+                <ul>
+                    {% for reason in result.reasons %}
+                    <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="ml-input-card">
+                <h3>本次輸入資料</h3>
+
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <h4>TESG 分數</h4>
+                        <p>{{ result.features["TESG分數"] }}</p>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>E 分數</h4>
+                        <p>{{ result.features["環境構面分數"] }}</p>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>S 分數</h4>
+                        <p>{{ result.features["社會構面分數"] }}</p>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>G 分數</h4>
+                        <p>{{ result.features["公司治理構面分數"] }}</p>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>平均市值</h4>
+                        <p>{{ result.features["市值_avg"] }}</p>
+                    </div>
+
+                    <div class="metric-card">
+                        <h4>前一期 ROA</h4>
+                        <p>{{ result.features["ROA_lag"] }}</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+</section>
+
+</body>
+</html>

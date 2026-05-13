@@ -1,0 +1,17 @@
+.sub-page {
+    min-height: 100vh;
+    padding: 100px 10%;
+    background: linear-gradient(135deg, #edf7f0, #dceee4);
+    color: #0b3d2e;
+}
+
+.sub-page h1 {
+    font-size: 44px;
+    margin-bottom: 20px;
+}
+
+.sub-page p {
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+}

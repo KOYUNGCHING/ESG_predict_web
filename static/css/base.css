@@ -1,0 +1,113 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background-color: #f4f8f5;
+    color: #173b2f;
+}
+
+.back-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #0b5c45;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: 0.3s ease;
+}
+
+.back-link:hover {
+    background-color: #087a58;
+}
+
+.error-box {
+    background-color: #fff2f2;
+    color: #a33a3a;
+    padding: 18px 22px;
+    border-radius: 14px;
+    border: 1px solid #f0b8b8;
+    margin-bottom: 28px;
+}
+
+.footer {
+    background-color: #073528;
+    color: white;
+    text-align: center;
+    padding: 32px 20px;
+}
+
+.footer p {
+    margin-bottom: 8px;
+    font-size: 15px;
+    opacity: 0.85;
+}
+
+.footer a {
+    color: #b9f3d3;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* 共用 metric card */
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin-bottom: 32px;
+}
+
+.metric-card {
+    background: white;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(31, 79, 61, 0.1);
+}
+
+.metric-card h4 {
+    font-size: 15px;
+    color: #5b7167;
+    margin-bottom: 12px;
+}
+
+.metric-card p {
+    font-size: 28px;
+    font-weight: 800;
+    color: #0b5c45;
+}
+
+.risk-badge {
+    padding: 14px 22px;
+    border-radius: 999px;
+    background-color: #e7f4ec;
+    color: #0b5c45;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.score-label {
+    color: #5b7167;
+    font-size: 15px;
+}
+
+.summary-reason {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #40574d;
+}
+
+@media (max-width: 900px) {
+    .metric-grid {
+        grid-template-columns: 1fr;
+    }
+}

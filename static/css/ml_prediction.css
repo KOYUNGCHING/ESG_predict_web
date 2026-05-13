@@ -1,0 +1,127 @@
+.ml-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #edf4fb, #e7f1ea);
+    padding: 60px 8%;
+    color: #0b3d2e;
+}
+
+.ml-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.ml-header {
+    margin-top: 40px;
+    margin-bottom: 36px;
+}
+
+.ml-header h1 {
+    font-size: 42px;
+    margin-bottom: 16px;
+}
+
+.ml-header p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: #536d62;
+}
+
+.ml-form-card {
+    background: white;
+    padding: 34px;
+    border-radius: 24px;
+    box-shadow: 0 12px 35px rgba(31, 79, 61, 0.12);
+    margin-bottom: 30px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    margin-bottom: 28px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #0b3d2e;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #c9ddd2;
+    border-radius: 14px;
+    font-size: 16px;
+    background-color: #f8fbf9;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #0b5c45;
+    box-shadow: 0 0 0 3px rgba(11, 92, 69, 0.12);
+}
+
+.predict-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 14px;
+    background-color: #0b5c45;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.predict-btn:hover {
+    background-color: #087a58;
+    transform: translateY(-2px);
+}
+
+.ml-result-section {
+    margin-top: 40px;
+}
+
+.ml-result-section h2 {
+    font-size: 32px;
+    margin-bottom: 24px;
+}
+
+.ml-summary-card,
+.ml-explain-card,
+.ml-input-card {
+    background: white;
+    padding: 32px;
+    border-radius: 24px;
+    box-shadow: 0 12px 35px rgba(31, 79, 61, 0.12);
+    margin-bottom: 28px;
+}
+
+.ml-summary-card h3 {
+    font-size: 52px;
+    color: #0b5c45;
+    margin: 10px 0 18px;
+}
+
+.ml-explain-card h3,
+.ml-input-card h3 {
+    font-size: 24px;
+    margin-bottom: 18px;
+}
+
+.ml-explain-card ul {
+    padding-left: 22px;
+}
+
+.ml-explain-card li {
+    margin-bottom: 12px;
+    line-height: 1.8;
+    color: #40574d;
+}
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,170 @@
+.hero-section {
+    width: 100%;
+    height: 100vh;
+    background-image: url("../images/earth_header.jpeg");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        rgba(255, 255, 255, 0.25),
+        rgba(8, 54, 39, 0.35)
+    );
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    color: #063f2c;
+    padding: 30px;
+}
+
+.hero-content h1 {
+    font-size: 72px;
+    letter-spacing: 12px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.hero-content p {
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+    color: #0e4a37;
+}
+
+.scroll-btn {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 999px;
+    background-color: #0b5c45;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-btn span {
+    margin-left: 8px;
+    font-size: 20px;
+}
+
+.scroll-btn:hover {
+    background-color: #087a58;
+    transform: translateY(-3px);
+}
+
+.model-section {
+    min-height: 100vh;
+    padding: 90px 8%;
+    background: linear-gradient(180deg, #f4f8f5, #e7f1ea);
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-title h2 {
+    font-size: 42px;
+    color: #0b3d2e;
+    margin-bottom: 12px;
+}
+
+.section-title p {
+    font-size: 18px;
+    color: #5b7167;
+}
+
+.model-card-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 35px;
+}
+
+.model-card {
+    background-color: white;
+    padding: 42px 32px;
+    border-radius: 24px;
+    box-shadow: 0 12px 35px rgba(31, 79, 61, 0.12);
+    cursor: pointer;
+    transition: 0.3s ease;
+    border: 1px solid rgba(11, 92, 69, 0.12);
+}
+
+.model-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 18px 45px rgba(31, 79, 61, 0.22);
+}
+
+.card-icon {
+    font-size: 44px;
+    margin-bottom: 20px;
+}
+
+.model-card h3 {
+    font-size: 24px;
+    margin-bottom: 18px;
+    color: #083d2c;
+}
+
+.model-card p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #5d6f66;
+    margin-bottom: 28px;
+}
+
+.model-card button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    background-color: #0b5c45;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.model-card button:hover {
+    background-color: #087a58;
+}
+
+@media (max-width: 1000px) {
+    .model-card-container {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-content h1 {
+        font-size: 52px;
+    }
+
+    .hero-content p {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-content h1 {
+        font-size: 38px;
+        letter-spacing: 6px;
+    }
+
+    .model-section {
+        padding: 70px 6%;
+    }
+
+    .section-title h2 {
+        font-size: 32px;
+    }
+}

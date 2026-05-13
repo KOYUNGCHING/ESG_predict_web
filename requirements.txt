@@ -1,0 +1,9 @@
+Flask
+pandas
+PyMuPDF
+transformers
+torch
+Werkzeug
+joblib
+scikit-learn
+xgboost
