@@ -1,8 +1,11 @@
 .ml-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #edf4fb, #e7f1ea);
+    background:
+        radial-gradient(circle at 10% 11%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 77% 7%, rgba(255, 255, 255, 0.85) 0 2px, transparent 3px),
+        linear-gradient(180deg, var(--space) 0 310px, var(--paper) 310px 100%);
     padding: 60px 8%;
-    color: #0b3d2e;
+    color: var(--ink);
 }
 
 .ml-container {
@@ -18,19 +21,23 @@
 .ml-header h1 {
     font-size: 42px;
     margin-bottom: 16px;
+    color: var(--cloud);
+    text-shadow: 4px 4px 0 var(--ink);
 }
 
 .ml-header p {
     font-size: 18px;
     line-height: 1.8;
-    color: #536d62;
+    color: #f1f1f1;
+    max-width: 820px;
 }
 
 .ml-form-card {
-    background: white;
+    background: var(--cloud);
     padding: 34px;
-    border-radius: 24px;
-    box-shadow: 0 12px 35px rgba(31, 79, 61, 0.12);
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
     margin-bottom: 30px;
 }
 
@@ -45,38 +52,41 @@
     display: block;
     font-weight: 700;
     margin-bottom: 10px;
-    color: #0b3d2e;
+    color: var(--ink);
 }
 
 .form-group input {
     width: 100%;
     padding: 14px 16px;
-    border: 1px solid #c9ddd2;
-    border-radius: 14px;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
     font-size: 16px;
-    background-color: #f8fbf9;
+    background-color: #eef8ff;
 }
 
 .form-group input:focus {
     outline: none;
-    border-color: #0b5c45;
-    box-shadow: 0 0 0 3px rgba(11, 92, 69, 0.12);
+    background-color: var(--cloud);
+    box-shadow: 0 0 0 4px rgba(84, 182, 60, 0.3);
 }
 
 .predict-btn {
     padding: 14px 28px;
-    border: none;
-    border-radius: 14px;
-    background-color: #0b5c45;
-    color: white;
+    border: var(--line);
+    border-radius: 8px;
+    background-color: var(--earth-green);
+    color: var(--ink);
     font-size: 16px;
+    font-weight: 900;
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: 0.18s ease;
+    box-shadow: var(--shadow-soft);
 }
 
 .predict-btn:hover {
-    background-color: #087a58;
-    transform: translateY(-2px);
+    background-color: var(--sun);
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--ink);
 }
 
 .ml-result-section {
@@ -91,16 +101,17 @@
 .ml-summary-card,
 .ml-explain-card,
 .ml-input-card {
-    background: white;
+    background: var(--cloud);
     padding: 32px;
-    border-radius: 24px;
-    box-shadow: 0 12px 35px rgba(31, 79, 61, 0.12);
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
     margin-bottom: 28px;
 }
 
 .ml-summary-card h3 {
     font-size: 52px;
-    color: #0b5c45;
+    color: var(--earth-green-dark);
     margin: 10px 0 18px;
 }
 
@@ -117,7 +128,7 @@
 .ml-explain-card li {
     margin-bottom: 12px;
     line-height: 1.8;
-    color: #40574d;
+    color: #303030;
 }
 
 @media (max-width: 900px) {

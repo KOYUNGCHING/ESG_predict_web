@@ -1,17 +1,59 @@
 .sub-page {
     min-height: 100vh;
-    padding: 100px 10%;
-    background: linear-gradient(135deg, #edf7f0, #dceee4);
-    color: #0b3d2e;
+    padding: 60px 8%;
+    background:
+        radial-gradient(circle at 10% 11%, rgba(255, 255, 255, 0.9) 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 15%, rgba(255, 255, 255, 0.85) 0 2px, transparent 3px),
+        linear-gradient(180deg, var(--space) 0 310px, var(--paper) 310px 100%);
+    color: var(--ink);
+}
+
+.sub-container {
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .sub-page h1 {
     font-size: 44px;
     margin-bottom: 20px;
+    margin-top: 40px;
+    color: var(--cloud);
+    text-shadow: 4px 4px 0 var(--ink);
 }
 
 .sub-page p {
     font-size: 18px;
     line-height: 1.8;
     margin-bottom: 40px;
+    color: #f1f1f1;
+    max-width: 760px;
+}
+
+.linear-panel {
+    background: var(--cloud);
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 34px;
+    margin-top: 36px;
+}
+
+.linear-panel h2 {
+    font-size: 28px;
+    margin-bottom: 14px;
+}
+
+.linear-panel p {
+    color: #303030;
+    margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .sub-page {
+        padding: 36px 6%;
+    }
+
+    .sub-page h1 {
+        font-size: 34px;
+    }
 }

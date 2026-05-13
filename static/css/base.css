@@ -4,44 +4,70 @@
     box-sizing: border-box;
 }
 
+:root {
+    --space: #444444;
+    --space-deep: #303030;
+    --ink: #111111;
+    --cloud: #ffffff;
+    --paper: #f7f7f2;
+    --earth-green: #54b63c;
+    --earth-green-dark: #2f852b;
+    --ocean-blue: #61b9ee;
+    --ocean-blue-dark: #2080bd;
+    --sun: #ffd35a;
+    --warning: #ff9f43;
+    --danger: #e55757;
+    --muted: #606060;
+    --line: 4px solid var(--ink);
+    --shadow: 8px 8px 0 var(--ink);
+    --shadow-soft: 5px 5px 0 var(--ink);
+}
+
 html {
     scroll-behavior: smooth;
 }
 
 body {
     font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
-    background-color: #f4f8f5;
-    color: #173b2f;
+    background: var(--paper);
+    color: var(--ink);
 }
 
 .back-link {
     display: inline-block;
-    padding: 12px 24px;
-    background-color: #0b5c45;
-    color: white;
+    padding: 11px 20px;
+    background-color: var(--cloud);
+    color: var(--ink);
     text-decoration: none;
-    border-radius: 12px;
-    transition: 0.3s ease;
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+    font-weight: 900;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
 .back-link:hover {
-    background-color: #087a58;
+    background-color: var(--sun);
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 var(--ink);
 }
 
 .error-box {
-    background-color: #fff2f2;
-    color: #a33a3a;
+    background-color: #fff0ee;
+    color: var(--ink);
     padding: 18px 22px;
-    border-radius: 14px;
-    border: 1px solid #f0b8b8;
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
     margin-bottom: 28px;
 }
 
 .footer {
-    background-color: #073528;
-    color: white;
+    background-color: var(--space-deep);
+    color: var(--cloud);
     text-align: center;
     padding: 32px 20px;
+    border-top: var(--line);
 }
 
 .footer p {
@@ -51,8 +77,9 @@ body {
 }
 
 .footer a {
-    color: #b9f3d3;
+    color: var(--sun);
     text-decoration: none;
+    font-weight: 800;
 }
 
 .footer a:hover {
@@ -68,42 +95,45 @@ body {
 }
 
 .metric-card {
-    background: white;
+    background: var(--cloud);
     padding: 24px;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(31, 79, 61, 0.1);
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
 }
 
 .metric-card h4 {
     font-size: 15px;
-    color: #5b7167;
+    color: var(--muted);
     margin-bottom: 12px;
 }
 
 .metric-card p {
     font-size: 28px;
     font-weight: 800;
-    color: #0b5c45;
+    color: var(--ocean-blue-dark);
 }
 
 .risk-badge {
     padding: 14px 22px;
-    border-radius: 999px;
-    background-color: #e7f4ec;
-    color: #0b5c45;
+    border-radius: 8px;
+    background-color: var(--sun);
+    color: var(--ink);
+    border: var(--line);
     font-weight: 800;
     white-space: nowrap;
 }
 
 .score-label {
-    color: #5b7167;
+    color: var(--muted);
     font-size: 15px;
+    font-weight: 800;
 }
 
 .summary-reason {
     font-size: 17px;
     line-height: 1.8;
-    color: #40574d;
+    color: #303030;
 }
 
 @media (max-width: 900px) {

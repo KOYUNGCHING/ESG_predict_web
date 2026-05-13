@@ -15,10 +15,9 @@
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        rgba(255, 255, 255, 0.25),
-        rgba(8, 54, 39, 0.35)
-    );
+    background:
+        linear-gradient(180deg, rgba(68, 68, 68, 0) 55%, rgba(68, 68, 68, 0.78) 100%),
+        radial-gradient(circle at 50% 68%, rgba(97, 185, 238, 0.12), transparent 34%);
 }
 
 .hero-content {
@@ -43,15 +42,16 @@
 }
 
 .scroll-btn {
-    padding: 14px 32px;
-    border: none;
-    border-radius: 999px;
-    background-color: #0b5c45;
-    color: white;
+    padding: 14px 30px;
+    border: var(--line);
+    border-radius: 8px;
+    background-color: var(--earth-green);
+    color: var(--ink);
     font-size: 16px;
+    font-weight: 900;
     cursor: pointer;
-    transition: 0.3s ease;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: 0.18s ease;
+    box-shadow: var(--shadow);
 }
 
 .scroll-btn span {
@@ -60,14 +60,19 @@
 }
 
 .scroll-btn:hover {
-    background-color: #087a58;
-    transform: translateY(-3px);
+    background-color: var(--sun);
+    transform: translate(4px, 4px);
+    box-shadow: 3px 3px 0 var(--ink);
 }
 
 .model-section {
     min-height: 100vh;
     padding: 90px 8%;
-    background: linear-gradient(180deg, #f4f8f5, #e7f1ea);
+    background:
+        radial-gradient(circle at 8% 18%, rgba(97, 185, 238, 0.32) 0 7px, transparent 8px),
+        radial-gradient(circle at 86% 12%, rgba(255, 211, 90, 0.55) 0 8px, transparent 9px),
+        linear-gradient(180deg, var(--space) 0 16%, var(--paper) 16% 100%);
+    border-top: var(--line);
 }
 
 .section-title {
@@ -77,13 +82,15 @@
 
 .section-title h2 {
     font-size: 42px;
-    color: #0b3d2e;
+    color: var(--cloud);
     margin-bottom: 12px;
+    text-shadow: 4px 4px 0 var(--ink);
 }
 
 .section-title p {
     font-size: 18px;
-    color: #5b7167;
+    color: #eeeeee;
+    font-weight: 700;
 }
 
 .model-card-container {
@@ -93,51 +100,61 @@
 }
 
 .model-card {
-    background-color: white;
-    padding: 42px 32px;
-    border-radius: 24px;
-    box-shadow: 0 12px 35px rgba(31, 79, 61, 0.12);
+    background-color: var(--cloud);
+    padding: 34px 30px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
     cursor: pointer;
-    transition: 0.3s ease;
-    border: 1px solid rgba(11, 92, 69, 0.12);
+    transition: 0.18s ease;
+    border: var(--line);
+    min-height: 330px;
 }
 
 .model-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 18px 45px rgba(31, 79, 61, 0.22);
+    transform: translate(5px, 5px);
+    box-shadow: 3px 3px 0 var(--ink);
 }
 
 .card-icon {
-    font-size: 44px;
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    font-size: 32px;
     margin-bottom: 20px;
+    background: var(--ocean-blue);
+    border: var(--line);
+    border-radius: 50%;
 }
 
 .model-card h3 {
     font-size: 24px;
     margin-bottom: 18px;
-    color: #083d2c;
+    color: var(--ink);
 }
 
 .model-card p {
     font-size: 16px;
     line-height: 1.8;
-    color: #5d6f66;
+    color: #444444;
     margin-bottom: 28px;
 }
 
 .model-card button {
     padding: 12px 24px;
-    border: none;
-    border-radius: 12px;
-    background-color: #0b5c45;
-    color: white;
+    border: var(--line);
+    border-radius: 8px;
+    background-color: var(--earth-green);
+    color: var(--ink);
     font-size: 15px;
+    font-weight: 900;
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: 0.18s ease;
+    box-shadow: 4px 4px 0 var(--ink);
 }
 
 .model-card button:hover {
-    background-color: #087a58;
+    background-color: var(--sun);
 }
 
 @media (max-width: 1000px) {
