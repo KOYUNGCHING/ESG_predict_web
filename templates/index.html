@@ -44,25 +44,35 @@
                 <button>進入分析</button>
             </div>
 
-            <!-- 第二區：線性預測 ESG -->
-            <div class="model-card" onclick="goToPage('/linear-esg')">
-                <div class="card-icon">📈</div>
-                <h3>線性預測 ESG</h3>
-                <p>
-                    使用線性回歸模型分析 ESG 分數與企業財務表現之間的關係。
-                </p>
-                <button>進入模型</button>
-            </div>
-
-            <!-- 第三區：機器學習預測 -->
+            <!-- 第二區：機器學習企業分析 -->
             <div class="model-card" onclick="goToPage('/ml-prediction')">
                 <div class="card-icon">🤖</div>
-                <h3>機器學習預測</h3>
+                <h3>機器學習企業分析</h3>
                 <p>
-                    使用 Random Forest、XGBoost 等機器學習模型，
-                    預測企業未來 ESG 或財務風險。
+                    輸入 ESG 與財務資料，一次產生 ROA 預測、財務風險、
+                    公司分群與漂綠警訊。
                 </p>
-                <button>進入預測</button>
+                <button>開始分析</button>
+            </div>
+
+            <!-- 第三區：線性回歸分析 -->
+            <div class="model-card" onclick="goToPage('/linear-esg')">
+                <div class="card-icon">📈</div>
+                <h3>線性回歸分析</h3>
+                <p>
+                    保留線性回歸模型頁面，之後可放入係數解釋、輸入欄位與預測結果。
+                </p>
+                <button>進入頁面</button>
+            </div>
+
+            <!-- 第四區：成果儀表板 -->
+            <div class="model-card" onclick="goToPage('/dashboard')">
+                <div class="card-icon">📊</div>
+                <h3>模型成果儀表板</h3>
+                <p>
+                    展示訓練模型比較、最佳模型、特徵重要度、描述統計與線性係數，
+                </p>
+                <button>查看成果</button>
             </div>
 
         </div>

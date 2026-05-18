@@ -71,7 +71,7 @@
     background:
         radial-gradient(circle at 8% 18%, rgba(97, 185, 238, 0.32) 0 7px, transparent 8px),
         radial-gradient(circle at 86% 12%, rgba(255, 211, 90, 0.55) 0 8px, transparent 9px),
-        linear-gradient(180deg, var(--space) 0 16%, var(--paper) 16% 100%);
+        linear-gradient(180deg, var(--space) 0 32%, var(--paper) 32% 100%);
     border-top: var(--line);
 }
 
@@ -179,6 +179,10 @@
 
     .model-section {
         padding: 70px 6%;
+        background:
+            radial-gradient(circle at 8% 12%, rgba(97, 185, 238, 0.32) 0 6px, transparent 7px),
+            radial-gradient(circle at 86% 9%, rgba(255, 211, 90, 0.55) 0 7px, transparent 8px),
+            linear-gradient(180deg, var(--space) 0 360px, var(--paper) 360px 100%);
     }
 
     .section-title h2 {

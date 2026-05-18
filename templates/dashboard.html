@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colab 成果儀表板｜地球股東會</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<section class="dashboard-page">
+    <div class="dashboard-container">
+
+        <a href="/" class="back-link">← 返回首頁</a>
+
+        <!-- 頁首：把 Colab 輸出的 CSV 轉成網站可看的成果頁 -->
+        <header class="dashboard-header">
+            <p class="eyebrow">Colab Results Dashboard</p>
+            <h1>模型成果儀表板</h1>
+            <p>整理目前訓練出的模型表現、特徵重要度、描述統計與線性係數。</p>
+        </header>
+
+        {% if dashboard.overview %}
+        <div class="overview-grid">
+            {% for item in dashboard.overview %}
+            <div class="overview-card">
+                <span>{{ item.label }}</span>
+                <strong>{{ item.value }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if dashboard.best_model %}
+        <section class="best-model">
+            <div>
+                <span>最佳 ROA 預測模型</span>
+                <h2>{{ dashboard.best_model.name }}</h2>
+            </div>
+            <div class="best-model-metrics">
+                <div>R2 <strong>{{ dashboard.best_model.r2 }}</strong></div>
+                <div>RMSE <strong>{{ dashboard.best_model.rmse }}</strong></div>
+                <div>MAE <strong>{{ dashboard.best_model.mae }}</strong></div>
+            </div>
+        </section>
+        {% endif %}
+
+        <div class="dashboard-grid">
+            <section class="data-panel">
+                <h2>模型比較</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>模型</th>
+                                <th>R2</th>
+                                <th>RMSE</th>
+                                <th>MAE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in dashboard.model_results %}
+                            <tr>
+                                <td>{{ row.Model }}</td>
+                                <td>{{ "%.3f"|format(row.R2) }}</td>
+                                <td>{{ "%.3f"|format(row.RMSE) }}</td>
+                                <td>{{ "%.3f"|format(row.MAE) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="data-panel">
+                <h2>Random Forest 特徵重要度</h2>
+                {% for row in dashboard.feature_importance %}
+                <div class="bar-row">
+                    <div class="bar-label">
+                        <span>{{ row.Feature }}</span>
+                        <strong>{{ "%.3f"|format(row.Importance) }}</strong>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: {{ row.Importance * 100 }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+
+            <section class="data-panel">
+                <h2>描述統計</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>變數</th>
+                                <th>均值</th>
+                                <th>標準差</th>
+                                <th>最小值</th>
+                                <th>最大值</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in dashboard.descriptive_stats %}
+                            <tr>
+                                <td>{{ row["變數"] }}</td>
+                                <td>{{ row["均值"] }}</td>
+                                <td>{{ row["標準差"] }}</td>
+                                <td>{{ row["最小值"] }}</td>
+                                <td>{{ row["最大值"] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="data-panel">
+                <h2>線性模型係數</h2>
+                {% for row in dashboard.linear_coefficients %}
+                <div class="coef-row">
+                    <span>{{ row.Feature }}</span>
+                    <strong>{{ "%.4f"|format(row.Coefficient) }}</strong>
+                </div>
+                {% endfor %}
+            </section>
+        </div>
+
+    </div>
+</section>
+
+</body>
+</html>

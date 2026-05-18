@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>機器學習預測｜ESG 與未來 ROA</title>
-    
+    <title>機器學習企業分析｜地球股東會</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/ml_prediction.css') }}">
 </head>
@@ -12,136 +11,214 @@
 <body>
 
 <section class="ml-page">
-
     <div class="ml-container">
 
         <a href="/" class="back-link">← 返回首頁</a>
 
-        <div class="ml-header">
-            <h1>機器學習預測</h1>
+        <header class="ml-header">
+            <p class="eyebrow">Enterprise ESG Analysis</p>
+            <h1>機器學習企業分析</h1>
             <p>
-                輸入企業 ESG 分數、E/S/G 構面分數、公司規模與前一期 ROA，
-                系統會使用訓練好的機器學習模型預測企業未來 ROA。
+                輸入企業 ESG、E/S/G 構面、公司規模與 ROA，
+                系統會輸出未來 ROA 預測、財務風險、公司分群與漂綠風險提示。
             </p>
+        </header>
+
+        <div class="model-status-grid">
+            <div class="status-pill active">ROA 預測已連接</div>
+            <div class="status-pill {{ 'active' if model_status.risk_ready else 'pending' }}">
+                財務風險：{{ '模型版' if model_status.risk_ready else '備援規則' }}
+            </div>
+            <div class="status-pill {{ 'active' if model_status.cluster_ready else 'pending' }}">
+                公司分群：{{ 'K-Means' if model_status.cluster_ready else '備援規則' }}
+            </div>
+            <div class="status-pill {{ 'active' if model_status.green_ready else 'pending' }}">
+                漂綠參考值：{{ '已建立' if model_status.green_ready else '待補資料' }}
+            </div>
         </div>
 
-        <div class="ml-form-card">
-            <form method="POST">
+        {% if error %}
+        <div class="error-box">{{ error }}</div>
+        {% endif %}
+
+        <div class="analysis-shell">
+            <form method="POST" class="ml-form-card">
+                <div class="form-heading">
+                    <h2>輸入企業資料</h2>
+                    <p>先用預設範例測試，再換成你要展示的公司。</p>
+                </div>
 
                 <div class="form-grid">
-
                     <div class="form-group">
                         <label>TESG 分數</label>
-                        <input type="number" step="0.01" name="tesg_score" placeholder="例如：60" required>
+                        <input type="number" step="0.01" name="tesg_score" value="{{ request.form.get('tesg_score', '60') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label>環境構面分數 E</label>
-                        <input type="number" step="0.01" name="env_score" placeholder="例如：65" required>
+                        <input type="number" step="0.01" name="env_score" value="{{ request.form.get('env_score', '65') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label>社會構面分數 S</label>
-                        <input type="number" step="0.01" name="social_score" placeholder="例如：70" required>
+                        <input type="number" step="0.01" name="social_score" value="{{ request.form.get('social_score', '70') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label>公司治理構面分數 G</label>
-                        <input type="number" step="0.01" name="gov_score" placeholder="例如：55" required>
+                        <input type="number" step="0.01" name="gov_score" value="{{ request.form.get('gov_score', '55') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label>公司規模 / 平均市值</label>
-                        <input type="number" step="1" name="market_value" placeholder="例如：1000000000" required>
+                        <input type="number" step="1" name="market_value" value="{{ request.form.get('market_value', '100000000') }}" required>
                     </div>
 
                     <div class="form-group">
                         <label>前一期 ROA</label>
-                        <input type="number" step="0.0001" name="roa_lag" placeholder="例如：2.5" required>
+                        <input type="number" step="0.0001" name="roa_lag" value="{{ request.form.get('roa_lag', '1.2') }}" required>
                     </div>
 
+                    <div class="form-group">
+                        <label>目前 ROA</label>
+                        <input type="number" step="0.0001" name="roa_avg" value="{{ request.form.get('roa_avg', '1.0') }}" required>
+                    </div>
                 </div>
 
-                <button type="submit" class="predict-btn">開始預測未來 ROA</button>
-
+                <button type="submit" class="predict-btn">產生企業分析</button>
             </form>
-        </div>
 
-        {% if error %}
-        <div class="error-box">
-            {{ error }}
-        </div>
-        {% endif %}
-
-        {% if result %}
-        <div class="ml-result-section">
-
-            <h2>預測結果</h2>
-
-            <div class="ml-summary-card">
-                <span class="score-label">預測未來 ROA</span>
-                <h3>{{ result.predicted_roa }}</h3>
-
-                <div class="risk-badge">
-                    {{ result.level }}
+            {% if result %}
+            <section class="ml-result-section">
+                <div class="result-heading">
+                    <h2>分析結果</h2>
+                    <p>一頁整理成展示時可以直接說明的四個重點。</p>
                 </div>
 
-                <p class="summary-reason">
-                    {{ result.conclusion }}
-                </p>
-            </div>
+                <div class="result-grid">
+                    <article class="result-card primary">
+                        <span>Predicted Future ROA</span>
+                        <h3>{{ result.predicted_roa }}</h3>
+                        <p>{{ result.conclusion }}｜相較前一期：{{ result.trend }}</p>
+                    </article>
 
-            <div class="ml-explain-card">
-                <h3>模型判斷原因</h3>
+                    <article class="result-card">
+                        <span>Financial Risk</span>
+                        <h3>{{ result.financial_risk }}</h3>
+                        <p>來源：{{ result.financial_risk_source }}</p>
+                    </article>
 
-                <ul>
-                    {% for reason in result.reasons %}
-                    <li>{{ reason }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+                    <article class="result-card">
+                        <span>Company ESG Type</span>
+                        <h3>{{ result.cluster_name }}</h3>
+                        <p>{{ result.cluster_id }}｜{{ result.cluster_source }}</p>
+                    </article>
 
-            <div class="ml-input-card">
-                <h3>本次輸入資料</h3>
+                    <article class="result-card">
+                        <span>Greenwashing Signal</span>
+                        <h3>
+                            {% if result.greenwashing_score is not none %}
+                                {{ result.greenwashing_score }} / 100
+                            {% else %}
+                                尚無分數
+                            {% endif %}
+                        </h3>
+                        <p>{{ result.greenwashing_level }}</p>
+                    </article>
+                </div>
 
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <h4>TESG 分數</h4>
-                        <p>{{ result.features["TESG分數"] }}</p>
-                    </div>
+                <div class="insight-grid">
+                    <article class="insight-card">
+                        <h3>ROA 預測依據</h3>
+                        <ul>
+                            {% for reason in result.reasons %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                            {% for evidence in result.roa_evidence %}
+                            <li>{{ evidence }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
 
-                    <div class="metric-card">
-                        <h4>E 分數</h4>
-                        <p>{{ result.features["環境構面分數"] }}</p>
-                    </div>
+                    <article class="insight-card">
+                        <h3>財務風險依據</h3>
+                        <ul>
+                            {% for reason in result.financial_risk_explanation %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                        </ul>
 
-                    <div class="metric-card">
-                        <h4>S 分數</h4>
-                        <p>{{ result.features["社會構面分數"] }}</p>
-                    </div>
+                        {% if result.financial_risk_probabilities %}
+                        <div class="probability-list">
+                            {% for item in result.financial_risk_probabilities %}
+                            <div class="probability-row">
+                                <div class="probability-label">
+                                    <span>{{ item.label }}</span>
+                                    <strong>{{ item.probability }}%</strong>
+                                </div>
+                                <div class="probability-track">
+                                    <div class="probability-fill" style="width: {{ item.probability }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </article>
 
-                    <div class="metric-card">
-                        <h4>G 分數</h4>
-                        <p>{{ result.features["公司治理構面分數"] }}</p>
-                    </div>
+                    <article class="insight-card">
+                        <h3>公司分群依據</h3>
+                        <ul>
+                            {% for reason in result.cluster_explanation %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
 
-                    <div class="metric-card">
-                        <h4>平均市值</h4>
-                        <p>{{ result.features["市值_avg"] }}</p>
-                    </div>
+                    <article class="insight-card">
+                        <h3>漂綠警訊依據</h3>
+                        <ul>
+                            {% for reason in result.greenwashing_reasons %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                        </ul>
+                    </article>
+                </div>
 
-                    <div class="metric-card">
-                        <h4>前一期 ROA</h4>
-                        <p>{{ result.features["ROA_lag"] }}</p>
+                {% if result.feature_importance %}
+                <div class="model-evidence-card">
+                    <h3>ROA 模型特徵重要度</h3>
+                    <div class="importance-grid">
+                        {% for item in result.feature_importance %}
+                        <div class="importance-row">
+                            <div class="importance-label">
+                                <span>{{ item.feature }}</span>
+                                <strong>{{ item.importance }}</strong>
+                            </div>
+                            <div class="importance-track">
+                                <div class="importance-fill" style="width: {{ item.importance * 100 }}%"></div>
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
+                {% endif %}
 
+                <div class="input-review">
+                    <h3>本次輸入資料</h3>
+                    <div class="mini-metric-grid">
+                        {% for label, value in result.features.items() %}
+                        <div class="mini-metric">
+                            <span>{{ label }}</span>
+                            <strong>{{ value }}</strong>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
         </div>
-        {% endif %}
 
     </div>
-
 </section>
 
 </body>
