@@ -5,13 +5,15 @@ __pycache__/
 uploads/
 *.pdf
 
-models/
-*.safetensors
-*.bin
-*.zip
-*.crdownload
-
 .env
 venv/
 env/
 .venv/
+
+*.crdownload
+
+# Large model files
+models/zero_shot_model/
+*.safetensors
+*.bin
+*.zip
