@@ -6,8 +6,6 @@ uploads/
 *.pdf
 
 models/
-*.joblib
-*.pkl
 *.safetensors
 *.bin
 *.zip
