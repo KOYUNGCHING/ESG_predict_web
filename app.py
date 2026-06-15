@@ -1,11 +1,8 @@
 from flask import Flask, render_template, request
 import os
-import fitz  # PyMuPDF
 import numpy as np
 import pandas as pd
 import joblib
-from werkzeug.utils import secure_filename
-from transformers import pipeline
 
 
 # =========================
@@ -15,16 +12,11 @@ from transformers import pipeline
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 MODEL_FOLDER = os.path.join(BASE_DIR, "models")
 DATA_FOLDER = os.path.join(BASE_DIR, "data")
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-ALLOWED_EXTENSIONS = {"pdf"}
+GREENWASHING_DATA_FOLDER = os.path.join(BASE_DIR, "data_2")
 
 # 自動建立資料夾
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(MODEL_FOLDER, exist_ok=True)
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
@@ -48,59 +40,15 @@ DATA_FILES = {
     "linear_coefficients": os.path.join(DATA_FOLDER, "linear_coefficients.csv"),
     "model_base": os.path.join(DATA_FOLDER, "model_base_merged.csv"),
 }
-ZERO_SHOT_MODEL_NAME = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
-ZERO_SHOT_MODEL_DIR = os.path.join(MODEL_FOLDER, "zero_shot_model")
-ZERO_SHOT_LABELS = [
-    "strong sustainability commitment",
-    "specific quantitative evidence",
-    "third-party verification or credible disclosure",
-    "vague promotional sustainability claim"
-]
+GREENWASHING_DATA_FILES = [
+    os.path.join(GREENWASHING_DATA_FOLDER, filename)
+    for filename in os.listdir(GREENWASHING_DATA_FOLDER)
+    if filename.endswith(".csv")
+] if os.path.isdir(GREENWASHING_DATA_FOLDER) else []
 
 
 # =========================
-# 1. NLP 模型載入：漂綠偵測
-# =========================
-
-zero_shot_clf = None
-
-
-def load_zero_shot_pipeline():
-    """
-    載入 zero-shot NLP 模型。
-    若 models/zero_shot_model 存在，就優先載入本機匯出的模型。
-    """
-    model_source = (
-        ZERO_SHOT_MODEL_DIR
-        if os.path.isdir(ZERO_SHOT_MODEL_DIR)
-        else ZERO_SHOT_MODEL_NAME
-    )
-
-    clf = pipeline(
-        "zero-shot-classification",
-        model=model_source,
-        tokenizer=model_source,
-        local_files_only=os.path.isdir(ZERO_SHOT_MODEL_DIR)
-    )
-    return clf
-
-
-def get_zero_shot_model():
-    """
-    讓 NLP 模型只載入一次。
-    """
-    global zero_shot_clf
-
-    if zero_shot_clf is None:
-        print("Loading zero-shot NLP model...")
-        zero_shot_clf = load_zero_shot_pipeline()
-        print("NLP model loaded.")
-
-    return zero_shot_clf
-
-
-# =========================
-# 2. ML 模型載入：未來 ROA 預測
+# 1. ML 模型載入：未來 ROA 預測
 # =========================
 
 roa_model = None
@@ -208,6 +156,156 @@ def read_csv_if_exists(path):
     return pd.read_csv(path, encoding="utf-8-sig")
 
 
+def load_greenwashing_dataset():
+    """
+    讀取 data_2 內已經批次分析完成的永續報告書漂綠結果。
+    每一列代表一份公司年度報告，不在網站端重新跑 NLP 模型。
+    """
+    frames = []
+
+    for path in GREENWASHING_DATA_FILES:
+        df = read_csv_if_exists(path)
+        if df is None or df.empty:
+            continue
+
+        company_name = os.path.basename(path).split("_")[0]
+        df = df.copy()
+        df["company"] = company_name
+        frames.append(df)
+
+    if not frames:
+        return pd.DataFrame()
+
+    dataset = pd.concat(frames, ignore_index=True)
+    dataset["year"] = dataset["year"].astype(int)
+    return dataset.sort_values(["company", "year"], ascending=[True, False])
+
+
+def get_greenwashing_options():
+    """
+    建立下拉選單選項。
+    value 用 company|year，避免不同公司同年度報告互相混淆。
+    """
+    dataset = load_greenwashing_dataset()
+    if dataset.empty:
+        return []
+
+    options = []
+    for _, row in dataset.iterrows():
+        company = row["company"]
+        year = int(row["year"])
+        report_name = row.get("report_name") or f"{company} {year}"
+        options.append({
+            "value": f"{company}|{year}",
+            "label": f"{company}｜{year}｜{report_name}",
+            "company": company,
+            "year": year
+        })
+
+    return options
+
+
+def format_report_level(level):
+    """
+    將 CSV 裡的 Low / Medium / High 顯示成原本頁面使用的整體風險標籤。
+    """
+    levels = {
+        "High": "High Greenwashing Risk",
+        "Medium": "Medium Greenwashing Risk",
+        "Low": "Low Greenwashing Risk",
+    }
+    return levels.get(str(level), str(level))
+
+
+def get_cell(row, column, default=None):
+    value = row.get(column, default)
+    if pd.isna(value):
+        return default
+    return value
+
+
+def build_top_chunks_from_row(row):
+    chunks = []
+
+    for rank in range(1, 6):
+        text = get_cell(row, f"top{rank}_text")
+        if not text:
+            continue
+
+        chunks.append({
+            "chunk_id": int(get_cell(row, f"top{rank}_chunk_id", rank)),
+            "risk_level": get_cell(row, f"top{rank}_risk_level", "-"),
+            "greenwashing_risk": float(get_cell(row, f"top{rank}_risk_score", 0)),
+            "commitment_score": float(get_cell(row, f"top{rank}_commitment_score", 0)),
+            "evidence_score": float(get_cell(row, f"top{rank}_evidence_score", 0)),
+            "credibility_score": float(get_cell(row, f"top{rank}_credibility_score", 0)),
+            "explanation": get_cell(row, f"top{rank}_analysis", ""),
+            "text": text,
+        })
+
+    return chunks
+
+
+def build_greenwashing_result_from_row(row):
+    top_chunks = build_top_chunks_from_row(row)
+    top_chunk = top_chunks[0] if top_chunks else {}
+
+    summary = {
+        "n_chunks": int(get_cell(row, "n_chunks", 0)),
+        "avg_commitment_score": round(float(get_cell(row, "avg_commitment_score", 0)), 2),
+        "avg_evidence_score": round(float(get_cell(row, "avg_evidence_score", 0)), 2),
+        "avg_credibility_score": round(float(get_cell(row, "avg_credibility_score", 0)), 2),
+        "top5_avg_greenwashing_risk": round(float(get_cell(row, "top5_avg_greenwashing_risk", 0)), 2),
+        "avg_greenwashing_risk": round(float(get_cell(row, "overall_greenwashing_risk_score", 0)), 2),
+        "max_greenwashing_risk": round(float(get_cell(row, "max_greenwashing_risk", 0)), 2),
+        "high_risk_ratio": round(float(get_cell(row, "high_risk_ratio", 0)), 2),
+        "medium_risk_ratio": round(float(get_cell(row, "medium_risk_ratio", 0)), 2),
+        "low_risk_ratio": round(float(get_cell(row, "low_risk_ratio", 0)), 2),
+        "report_greenwashing_score": round(float(get_cell(row, "overall_greenwashing_risk_score", 0)), 2),
+        "report_level": format_report_level(get_cell(row, "overall_risk_level", "")),
+        "summary_reason": get_cell(row, "report_analysis", ""),
+        "top_risk_text": top_chunk.get("text", ""),
+        "top_risk_score": round(float(top_chunk.get("greenwashing_risk", 0)), 2),
+        "top_risk_level": top_chunk.get("risk_level", "-"),
+        "top_risk_explanation": top_chunk.get("explanation", ""),
+    }
+
+    report_name = get_cell(row, "report_name", "")
+    year = int(get_cell(row, "year", 0))
+    company = get_cell(row, "company", "")
+
+    return {
+        "filename": f"{company}｜{year}｜{report_name}",
+        "summary": summary,
+        "top_chunks": top_chunks,
+    }
+
+
+def find_greenwashing_report(selection):
+    if not selection or "|" not in selection:
+        return None
+
+    company, year_text = selection.split("|", 1)
+    try:
+        year = int(year_text)
+    except ValueError:
+        return None
+
+    dataset = load_greenwashing_dataset()
+    if dataset.empty:
+        return None
+
+    matched = dataset.loc[
+        (dataset["company"] == company)
+        & (dataset["year"] == year)
+    ]
+
+    if matched.empty:
+        return None
+
+    return build_greenwashing_result_from_row(matched.iloc[0])
+
+
 def build_greenwashing_reference_from_csv():
     """
     若沒有 greenwashing_reference.pkl，就用 Colab 匯出的資料表建立平均參考值。
@@ -239,305 +337,7 @@ def build_greenwashing_reference_from_csv():
 
 
 # =========================
-# 3. PDF 基本工具
-# =========================
-
-def allowed_file(filename):
-    """
-    檢查檔案是否為允許格式。
-    目前只允許 PDF。
-    """
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def extract_text_from_pdf(pdf_path):
-    """
-    使用 PyMuPDF 從 PDF 抽取文字。
-    如果 PDF 是掃描檔，這個方法可能抽不到文字。
-    """
-    text = ""
-
-    doc = fitz.open(pdf_path)
-
-    for page in doc:
-        page_text = page.get_text()
-        text += page_text + "\n"
-
-    doc.close()
-
-    return text
-
-
-def split_text_into_chunks(text, max_chars=900):
-    """
-    將報告文字切成 chunks。
-    """
-    paragraphs = [p.strip() for p in text.split("\n") if len(p.strip()) > 30]
-
-    chunks = []
-    current = ""
-
-    for p in paragraphs:
-        if len(current) + len(p) <= max_chars:
-            current += " " + p
-        else:
-            if current.strip():
-                chunks.append(current.strip())
-            current = p
-
-    if current.strip():
-        chunks.append(current.strip())
-
-    return chunks
-
-
-def truncate_text(text, max_chars=900):
-    """
-    避免送進 NLP model 的文字過長。
-    """
-    if len(text) <= max_chars:
-        return text
-    return text[:max_chars]
-
-
-# =========================
-# 4. NLP 漂綠偵測核心
-# =========================
-
-def build_greenwashing_scores(result):
-    scores = dict(zip(result["labels"], result["scores"]))
-
-    commitment_score = scores.get("strong sustainability commitment", 0) * 100
-    evidence_score = scores.get("specific quantitative evidence", 0) * 100
-    credibility_score = scores.get("third-party verification or credible disclosure", 0) * 100
-    vague_claim_score = scores.get("vague promotional sustainability claim", 0) * 100
-
-    commitment_evidence_gap = max(0, commitment_score - evidence_score)
-
-    greenwashing_risk = (
-        0.35 * commitment_evidence_gap +
-        0.30 * vague_claim_score +
-        0.20 * (100 - credibility_score) +
-        0.15 * (100 - evidence_score)
-    )
-
-    greenwashing_risk = max(0, min(100, greenwashing_risk))
-
-    if greenwashing_risk >= 60:
-        risk_level = "High"
-    elif greenwashing_risk >= 30:
-        risk_level = "Medium"
-    else:
-        risk_level = "Low"
-
-    explanation = generate_nlp_explanation(
-        commitment_score,
-        evidence_score,
-        credibility_score,
-        vague_claim_score,
-        greenwashing_risk
-    )
-
-    return {
-        "commitment_score": round(commitment_score, 2),
-        "evidence_score": round(evidence_score, 2),
-        "credibility_score": round(credibility_score, 2),
-        "vague_claim_score": round(vague_claim_score, 2),
-        "greenwashing_risk": round(greenwashing_risk, 2),
-        "risk_level": risk_level,
-        "explanation": explanation
-    }
-
-
-def score_chunk_with_nlp(text, clf):
-    """
-    使用 zero-shot NLP model 分析單一段落。
-    分析概念：
-    承諾高 + 證據低 + 可信度低 + 空泛宣傳高
-    => 漂綠風險高
-    """
-
-    text_for_model = truncate_text(text, max_chars=900)
-
-    result = clf(
-        text_for_model,
-        candidate_labels=ZERO_SHOT_LABELS,
-        multi_label=True
-    )
-
-    return build_greenwashing_scores(result)
-
-
-def score_chunks_with_nlp(chunks, clf):
-    """
-    批次分析多個段落，減少反覆呼叫 pipeline 的等待時間。
-    """
-    texts_for_model = [truncate_text(chunk, max_chars=900) for chunk in chunks]
-    results = clf(
-        texts_for_model,
-        candidate_labels=ZERO_SHOT_LABELS,
-        multi_label=True,
-        batch_size=4
-    )
-    return [build_greenwashing_scores(result) for result in results]
-
-
-def generate_nlp_explanation(
-    commitment_score,
-    evidence_score,
-    credibility_score,
-    vague_claim_score,
-    greenwashing_risk
-):
-    """
-    根據 NLP 分數產生原因。
-    """
-    reasons = []
-
-    if commitment_score >= 60:
-        reasons.append("此段落被 NLP 模型判斷為具有較強的永續承諾、目標或願景敘述。")
-
-    if evidence_score < 40:
-        reasons.append("具體量化證據分數偏低，代表段落中可能缺少明確數據、百分比、年份或成果指標。")
-
-    if vague_claim_score >= 50:
-        reasons.append("模型偵測到較高比例的空泛或宣傳式永續敘述。")
-
-    if credibility_score < 40:
-        reasons.append("可信揭露或第三方驗證訊號較弱，因此降低整體可信度。")
-
-    if greenwashing_risk >= 60:
-        reasons.append("綜合以上因素，此段落被歸類為高漂綠風險。")
-    elif greenwashing_risk >= 30:
-        reasons.append("綜合以上因素，此段落被歸類為中等漂綠風險。")
-    else:
-        reasons.append("綜合以上因素，此段落的漂綠風險較低。")
-
-    return " ".join(reasons)
-
-
-# =========================
-# 5. 漂綠整份報告彙整
-# =========================
-
-def summarize_report(results_df):
-    """
-    將所有 chunk 的結果彙整成整份報告結果。
-    """
-
-    avg_commitment = results_df["commitment_score"].mean()
-    avg_evidence = results_df["evidence_score"].mean()
-    avg_credibility = results_df["credibility_score"].mean()
-    avg_vague_claim = results_df["vague_claim_score"].mean()
-    avg_greenwashing = results_df["greenwashing_risk"].mean()
-
-    max_greenwashing = results_df["greenwashing_risk"].max()
-
-    high_risk_ratio = (results_df["risk_level"] == "High").mean()
-    medium_risk_ratio = (results_df["risk_level"] == "Medium").mean()
-    low_risk_ratio = (results_df["risk_level"] == "Low").mean()
-
-    report_score = (
-        0.5 * avg_greenwashing +
-        0.3 * max_greenwashing +
-        0.2 * high_risk_ratio * 100
-    )
-
-    report_score = max(0, min(100, report_score))
-
-    if report_score >= 60:
-        report_level = "High Greenwashing Risk"
-    elif report_score >= 30:
-        report_level = "Medium Greenwashing Risk"
-    else:
-        report_level = "Low Greenwashing Risk"
-
-    top_row = results_df.sort_values("greenwashing_risk", ascending=False).iloc[0]
-
-    summary_reason = generate_report_reason(
-        avg_commitment=avg_commitment,
-        avg_evidence=avg_evidence,
-        avg_credibility=avg_credibility,
-        avg_vague_claim=avg_vague_claim,
-        max_greenwashing=max_greenwashing,
-        high_risk_ratio=high_risk_ratio,
-        report_level=report_level
-    )
-
-    return {
-        "n_chunks": len(results_df),
-
-        "avg_commitment_score": round(avg_commitment, 2),
-        "avg_evidence_score": round(avg_evidence, 2),
-        "avg_credibility_score": round(avg_credibility, 2),
-        "avg_vague_claim_score": round(avg_vague_claim, 2),
-
-        "avg_greenwashing_risk": round(avg_greenwashing, 2),
-        "max_greenwashing_risk": round(max_greenwashing, 2),
-
-        "high_risk_ratio": round(high_risk_ratio, 2),
-        "medium_risk_ratio": round(medium_risk_ratio, 2),
-        "low_risk_ratio": round(low_risk_ratio, 2),
-
-        "report_greenwashing_score": round(report_score, 2),
-        "report_level": report_level,
-        "summary_reason": summary_reason,
-
-        "top_risk_text": top_row["text"],
-        "top_risk_score": round(top_row["greenwashing_risk"], 2),
-        "top_risk_level": top_row["risk_level"],
-        "top_risk_explanation": top_row["explanation"]
-    }
-
-
-def generate_report_reason(
-    avg_commitment,
-    avg_evidence,
-    avg_credibility,
-    avg_vague_claim,
-    max_greenwashing,
-    high_risk_ratio,
-    report_level
-):
-    """
-    產生整份報告的原因解釋。
-    """
-
-    reasons = []
-
-    if avg_commitment > avg_evidence + 20:
-        reasons.append("整體而言，報告中的永續承諾分數明顯高於具體證據分數。")
-
-    if avg_evidence < 40:
-        reasons.append("整體量化證據分數偏低，代表部分內容可能缺少明確數據、指標或成果佐證。")
-
-    if avg_credibility < 40:
-        reasons.append("可信揭露與第三方驗證訊號偏弱，可能降低報告內容的可信度。")
-
-    if avg_vague_claim >= 50:
-        reasons.append("報告中有較多空泛或宣傳式的永續敘述。")
-
-    if max_greenwashing >= 60:
-        reasons.append("報告中至少有一個段落被判定為高漂綠風險。")
-
-    if high_risk_ratio >= 0.1:
-        reasons.append("高風險段落占比達到需要注意的程度。")
-
-    if not reasons:
-        reasons.append("大多數段落的承諾、證據與可信度相對平衡，沒有明顯漂綠訊號。")
-
-    if "High" in report_level:
-        conclusion = "整體而言，這份報告具有較高的潛在漂綠風險。"
-    elif "Medium" in report_level:
-        conclusion = "整體而言，這份報告具有中等程度的潛在漂綠風險。"
-    else:
-        conclusion = "整體而言，這份報告的潛在漂綠風險較低。"
-
-    return conclusion + " " + " ".join(reasons)
-
-
-# =========================
-# 6. ML 預測解釋
+# 3. ML 預測解釋
 # =========================
 
 def get_reference_metrics():
@@ -951,88 +751,60 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/usage")
+def usage():
+    """
+    網頁使用說明頁面。
+    """
+    return render_template("usage.html")
+
+
+@app.route("/about")
+def about():
+    """
+    關於我們頁面。
+    """
+    return render_template("about.html")
+
+
+@app.route("/links")
+def links():
+    """
+    相關連結頁面。
+    """
+    return render_template("links.html")
+
+
 @app.route("/greenwashing", methods=["GET", "POST"])
 def greenwashing():
     """
     永續報告書漂綠偵測頁面。
-    GET：顯示上傳頁面
-    POST：接收 PDF，進行 NLP 分析，輸出結果
+    GET：顯示 data_2 已批次完成的報告選項
+    POST：依公司年度查詢既有結果，不在網站端重新跑 NLP 模型
     """
 
     result = None
     error = None
+    selected_report = None
+    report_options = get_greenwashing_options()
 
     if request.method == "POST":
+        selected_report = request.form.get("report_key")
 
-        if "report_file" not in request.files:
-            error = "沒有收到檔案，請重新上傳。"
-            return render_template("greenwashing.html", result=result, error=error)
+        if not selected_report:
+            error = "請先選擇一份已分析的永續報告書。"
+        else:
+            result = find_greenwashing_report(selected_report)
+            if result is None:
+                error = "找不到這份報告的固定分析結果，請確認 data_2 資料是否完整。"
 
-        file = request.files["report_file"]
-
-        if file.filename == "":
-            error = "請先選擇一份 PDF 永續報告書。"
-            return render_template("greenwashing.html", result=result, error=error)
-
-        if not allowed_file(file.filename):
-            error = "目前只支援 PDF 檔案。"
-            return render_template("greenwashing.html", result=result, error=error)
-
-        filename = secure_filename(file.filename)
-        pdf_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(pdf_path)
-
-        try:
-            text = extract_text_from_pdf(pdf_path)
-
-            if len(text.strip()) < 500:
-                error = "PDF 文字太短，可能是掃描檔、圖片型 PDF，或無法直接讀取文字。"
-                return render_template("greenwashing.html", result=result, error=error)
-
-            chunks = split_text_into_chunks(text, max_chars=900)
-
-            if len(chunks) == 0:
-                error = "無法從 PDF 中切出可分析的文字段落。"
-                return render_template("greenwashing.html", result=result, error=error)
-
-            # demo 先限制前 15 段，讓網頁分析時間比較可控。
-            chunks = chunks[:15]
-
-            clf = get_zero_shot_model()
-
-            rows = []
-            chunk_scores = score_chunks_with_nlp(chunks, clf)
-
-            for i, (chunk, scores) in enumerate(zip(chunks, chunk_scores)):
-                rows.append({
-                    "chunk_id": i,
-                    "text": chunk,
-                    **scores
-                })
-
-            results_df = pd.DataFrame(rows)
-
-            if results_df.empty:
-                error = "分析結果為空，請確認 PDF 是否含有可讀文字。"
-                return render_template("greenwashing.html", result=result, error=error)
-
-            summary = summarize_report(results_df)
-
-            top_chunks = results_df.sort_values(
-                "greenwashing_risk",
-                ascending=False
-            ).head(5)
-
-            result = {
-                "filename": filename,
-                "summary": summary,
-                "top_chunks": top_chunks.to_dict(orient="records")
-            }
-
-        except Exception as e:
-            error = f"分析失敗：{str(e)}"
-
-    return render_template("greenwashing.html", result=result, error=error)
+    return render_template(
+        "greenwashing.html",
+        result=result,
+        error=error,
+        report_options=report_options,
+        selected_report=selected_report
+    )
 
 
 @app.route("/dashboard")
@@ -1043,15 +815,6 @@ def dashboard():
     """
     dashboard_data = build_dashboard_data()
     return render_template("dashboard.html", dashboard=dashboard_data)
-
-
-@app.route("/linear-esg")
-def linear_esg():
-    """
-    線性回歸分析頁面。
-    目前先保留乾淨空白頁，方便後續擴充線性模型展示。
-    """
-    return render_template("linear_esg.html")
 
 
 @app.route("/ml-prediction", methods=["GET", "POST"])
@@ -1130,5 +893,8 @@ def ml_prediction():
 # 9. 啟動 Flask
 # =========================
 
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port)

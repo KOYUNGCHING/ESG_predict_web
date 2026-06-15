@@ -19,26 +19,31 @@
         <div class="gw-header">
             <h1>永續報告書漂綠偵測</h1>
             <p>
-                上傳企業永續報告書 PDF，系統會使用 NLP 模型分析報告中的永續承諾、
-                量化證據、可信揭露與潛在漂綠風險。
+                選擇已完成批次分析的企業永續報告書，系統會直接顯示固定資料中的
+                承諾、量化證據、可信揭露與潛在漂綠風險結果。
             </p>
         </div>
 
-        <!-- 上傳 PDF 區塊 -->
+        <!-- 固定資料查詢區塊 -->
         <div class="upload-card">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST">
 
-                <label class="upload-label">上傳永續報告書 PDF</label>
+                <label class="upload-label" for="report_key">選擇永續報告書</label>
 
-                <input
-                    type="file"
-                    name="report_file"
-                    accept=".pdf"
-                    required
-                >
+                <select id="report_key" name="report_key" required>
+                    <option value="">請選擇公司與年度</option>
+                    {% for option in report_options %}
+                    <option
+                        value="{{ option.value }}"
+                        {% if selected_report == option.value %}selected{% endif %}
+                    >
+                        {{ option.label }}
+                    </option>
+                    {% endfor %}
+                </select>
 
                 <button type="submit" class="analyze-btn">
-                    開始分析漂綠風險
+                    查詢漂綠風險
                 </button>
 
             </form>
@@ -104,8 +109,8 @@
                 </div>
 
                 <div class="metric-card">
-                    <h4>平均空泛宣傳分數</h4>
-                    <p>{{ result.summary.avg_vague_claim_score }}</p>
+                    <h4>Top 5 平均風險</h4>
+                    <p>{{ result.summary.top5_avg_greenwashing_risk }}</p>
                 </div>
 
                 <div class="metric-card">

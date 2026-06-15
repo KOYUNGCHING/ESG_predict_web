@@ -1,6 +1,6 @@
 # 地球股東會 ESG 分析平台
 
-這是一個以 Flask 建立的 ESG 分析網站，整合永續報告書漂綠偵測、企業機器學習分析、線性回歸頁面與模型成果儀表板。網站風格以主頁地球插圖為基礎，採用粗線框、亮綠與藍色的手繪感介面。
+這是一個以 Flask 建立的 ESG 分析網站，整合永續報告書漂綠偵測、企業機器學習分析與模型成果儀表板。網站風格以主頁地球插圖為基礎，採用粗線框、亮綠與藍色的手繪感介面。
 
 ## 功能說明
 
@@ -16,7 +16,6 @@ http://127.0.0.1:5000/
 
 - 永續報告書漂綠偵測
 - 機器學習企業分析
-- 線性回歸分析
 - 模型成果儀表板
 
 ### 2. 永續報告書漂綠偵測
@@ -29,10 +28,10 @@ http://127.0.0.1:5000/greenwashing
 
 功能：
 
-- 上傳企業永續報告書 PDF
-- 使用 zero-shot NLP 模型分析段落
-- 輸出整份報告漂綠風險分數
-- 顯示高風險段落與模型判斷原因
+- 從 `data_2/` 選擇已批次分析完成的公司年度報告
+- 直接輸出整份報告漂綠風險分數
+- 顯示高風險段落與既有分析原因
+- 網站端不重新上傳 PDF，也不重新執行 NLP 模型
 
 ### 3. 機器學習企業分析
 
@@ -65,17 +64,7 @@ http://127.0.0.1:5000/ml-prediction
 - 漂綠警訊依據
 - ROA 模型特徵重要度
 
-### 4. 線性回歸分析
-
-網址：
-
-```text
-http://127.0.0.1:5000/linear-esg
-```
-
-目前此頁保留為空白頁面，作為後續線性回歸模型展示的擴充位置。
-
-### 5. 模型成果儀表板
+### 4. 模型成果儀表板
 
 網址：
 
@@ -105,6 +94,12 @@ ESG_predict_web/
 │   ├── model_base_merged.csv
 │   ├── model_results_summary.csv
 │   └── rf_feature_importance.csv
+├── data_2/
+│   ├── 台新_2013_2024_batch_summary.csv
+│   ├── 國泰_2011_2024_batch_summary.csv
+│   ├── 富邦_2006_2024_batch_summary.csv
+│   ├── 彰銀_2014_2024_batch_summary.csv
+│   └── 統一證_2009_2024_batch_summary.csv
 ├── models/
 │   ├── roa_prediction_model.joblib
 │   ├── model_features.pkl
@@ -115,8 +110,7 @@ ESG_predict_web/
 │   ├── cluster_scaler.pkl
 │   ├── cluster_features.pkl
 │   ├── cluster_names.pkl
-│   ├── greenwashing_reference.pkl
-│   └── zero_shot_model/
+│   └── greenwashing_reference.pkl
 ├── static/
 │   ├── css/
 │   ├── images/
@@ -125,7 +119,6 @@ ESG_predict_web/
 │   ├── index.html
 │   ├── greenwashing.html
 │   ├── ml_prediction.html
-│   ├── linear_esg.html
 │   └── dashboard.html
 └── uploads/
 ```
@@ -138,9 +131,6 @@ ESG_predict_web/
 
 - Flask
 - pandas
-- PyMuPDF
-- transformers
-- torch
 - joblib
 - scikit-learn
 - xgboost
@@ -155,14 +145,30 @@ requirements.txt
 
 ### 1. 進入專案資料夾
 
+macOS / Linux：
+
 ```bash
-cd /Users/yungching/Desktop/esg/ESG_predict_web
+cd /Users/你的使用者名稱/Desktop/esg/ESG_predict_web
+```
+
+Windows：
+
+```powershell
+cd C:\Users\你的使用者名稱\Desktop\esg\ESG_predict_web
 ```
 
 ### 2. 建立虛擬環境
 
+macOS / Linux：
+
 ```bash
 python3 -m venv .venv
+```
+
+Windows：
+
+```powershell
+py -m venv .venv
 ```
 
 ### 3. 啟動虛擬環境
@@ -175,14 +181,34 @@ source .venv/bin/activate
 
 Windows：
 
-```bash
+```powershell
+.venv\Scripts\activate
+```
+
+如果 Windows PowerShell 顯示不能執行 scripts，可以先執行：
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+再重新啟動虛擬環境：
+
+```powershell
 .venv\Scripts\activate
 ```
 
 ### 4. 安裝套件
 
+macOS / Linux：
+
 ```bash
 pip install -r requirements.txt
+```
+
+Windows：
+
+```powershell
+python -m pip install -r requirements.txt
 ```
 
 ### 5. 確認模型與資料檔案
@@ -216,8 +242,16 @@ model_base_merged.csv
 
 ### 6. 啟動 Flask 網站
 
+macOS / Linux：
+
 ```bash
 python3 app.py
+```
+
+Windows：
+
+```powershell
+python app.py
 ```
 
 啟動成功後，終端機會顯示：
@@ -244,13 +278,13 @@ http://127.0.0.1:5000
 
 請確認 Colab 匯出的模型檔是否已放入 `models/`。
 
-### 2. PDF 無法分析
+### 2. 永續頁沒有報告選項
 
-如果 PDF 是掃描檔或圖片型 PDF，PyMuPDF 可能無法抽取文字。此時系統會提示 PDF 文字太短或無法讀取。
+請確認 `data_2/` 內有批次分析完成的 CSV，且欄位包含 `company` 可由檔名推得、`year`、整體分數與 top 1 至 top 5 段落欄位。
 
-### 3. 第一次分析報告書很慢
+### 3. 查不到某份永續報告
 
-漂綠偵測會載入 NLP 模型，第一次執行通常較慢。模型載入後，同一次 server 執行期間會重複使用模型。
+永續頁使用「公司名稱｜年度」查詢固定資料。如果 CSV 檔名或 `year` 欄位有誤，頁面會顯示找不到固定分析結果。
 
 ### 4. model_features.pkl 和模型欄位不一致
 

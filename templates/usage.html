@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁使用說明｜地球股東會</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/info_pages.css') }}">
+</head>
+
+<body>
+
+<section class="info-page">
+    <div class="info-container">
+        <a href="/" class="back-link">← 返回首頁</a>
+
+        <header class="info-header">
+            <p class="eyebrow">Guide</p>
+            <h1>網頁使用說明</h1>
+        </header>
+
+        <div class="info-grid">
+            <article class="info-card">
+                <h2>永續報告書漂綠偵測</h2>
+                <p>進入「永續」頁面，上傳 PDF 報告書後，系統會分析段落的承諾、證據、可信度與空泛宣傳程度，並產生整體漂綠風險。</p>
+            </article>
+
+            <article class="info-card">
+                <h2>機器學習企業分析</h2>
+                <p>輸入 ESG、E/S/G、平均市值、前一期 ROA 與目前 ROA，系統會輸出 ROA 預測、財務風險、公司分群與漂綠警訊。</p>
+            </article>
+
+            <article class="info-card">
+                <h2>模型成果儀表板</h2>
+                <p>進入「相關成果」頁面可查看模型比較、最佳模型、特徵重要度、描述統計與線性模型係數。</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

@@ -16,4 +16,7 @@ env/
 models/zero_shot_model/
 *.safetensors
 *.bin
-*.zip
+*.zipmodels/zero_shot_model/
+.venv/
+__pycache__/
+.DS_Store

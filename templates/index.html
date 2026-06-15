@@ -10,6 +10,23 @@
 
 <body>
 
+    <nav class="site-menu" aria-label="主選單">
+        <button class="hamburger-btn" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="home-dropdown-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <div id="home-dropdown-menu" class="dropdown-menu">
+            <a href="/">首頁</a>
+            <a href="/greenwashing">永續</a>
+            <a href="/ml-prediction">機器學習</a>
+            <a href="/usage">網頁使用說明</a>
+            <a href="/about">關於我們</a>
+            <a href="/links">相關連結</a>
+        </div>
+    </nav>
+
     <!-- 第一頁：主視覺區 -->
     <section class="hero-section">
         <div class="hero-overlay"></div>
@@ -55,17 +72,7 @@
                 <button>開始分析</button>
             </div>
 
-            <!-- 第三區：線性回歸分析 -->
-            <div class="model-card" onclick="goToPage('/linear-esg')">
-                <div class="card-icon">📈</div>
-                <h3>線性回歸分析</h3>
-                <p>
-                    保留線性回歸模型頁面，之後可放入係數解釋、輸入欄位與預測結果。
-                </p>
-                <button>進入頁面</button>
-            </div>
-
-            <!-- 第四區：成果儀表板 -->
+            <!-- 第三區：成果儀表板 -->
             <div class="model-card" onclick="goToPage('/dashboard')">
                 <div class="card-icon">📊</div>
                 <h3>模型成果儀表板</h3>
@@ -84,7 +91,13 @@
     <footer class="footer">
         <p>參考資料</p>
         <a href="https://esggenplus.twse.com.tw/inquiry/report?lang=zh-TW" target="_blank">
-            永續報告書入口網頁
+            ESG數位平台
+        </a>
+        <a href="https://tejpro.tej.com.tw/SchoolDoc/TEJ/?lang=zh-TW" target="_blank">
+            TEJ Pro
+        </a>
+        <a href="https://www.twse.com.tw/zh/index.html" target="_blank">
+            股市資料平台
         </a>
     </footer>
 
