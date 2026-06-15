@@ -97,6 +97,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 35px;
+    margin-top: 120px;
 }
 
 .model-card {
@@ -160,6 +161,7 @@
 @media (max-width: 1000px) {
     .model-card-container {
         grid-template-columns: 1fr;
+        margin-top: 34px;
     }
 
     .hero-content h1 {
