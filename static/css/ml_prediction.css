@@ -37,6 +37,20 @@
     color: #f1f1f1;
 }
 
+.scope-note {
+    display: inline-block;
+    max-width: 900px;
+    margin-bottom: 24px;
+    padding: 14px 18px;
+    background: #fff7d8;
+    border: var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow-soft);
+    color: var(--ink);
+    font-weight: 900;
+    line-height: 1.7;
+}
+
 .model-status-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

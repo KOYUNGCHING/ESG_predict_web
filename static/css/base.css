@@ -149,6 +149,15 @@ body {
     opacity: 0.85;
 }
 
+.footer .footer-note {
+    max-width: 820px;
+    margin: 0 auto 18px;
+    color: var(--sun);
+    font-weight: 900;
+    line-height: 1.7;
+    opacity: 1;
+}
+
 .footer a {
     color: var(--sun);
     text-decoration: none;
