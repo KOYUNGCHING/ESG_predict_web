@@ -19,8 +19,14 @@
         <header class="dashboard-header">
             <p class="eyebrow">Colab Results Dashboard</p>
             <h1>模型成果儀表板</h1>
-            <p>整理目前訓練出的模型表現、特徵重要度、描述統計與線性係數。</p>
+            <p>保留原始 Colab 匯出的當期 ROA 模型表現、特徵重要度、描述統計與線性係數。</p>
         </header>
+
+        <section class="data-panel research-intro">
+            <h2>完整研究分析已補入</h2>
+            <p>本頁的原始三模型成績以當期 ROA 為目標，不能當成未來預測成績。網站載入的預測模型與本表也不是同一份評估。</p>
+            <p><a href="{{ url_for('research') }}">查看完整研究：五模型未來預測、相關性、規模異質性、公司分群與文本驗證 →</a></p>
+        </section>
 
         {% if dashboard.overview %}
         <div class="overview-grid">
@@ -36,7 +42,7 @@
         {% if dashboard.best_model %}
         <section class="best-model">
             <div>
-                <span>最佳 ROA 預測模型</span>
+                <span>原始當期 ROA 比較中最佳模型</span>
                 <h2>{{ dashboard.best_model.name }}</h2>
             </div>
             <div class="best-model-metrics">
@@ -49,7 +55,7 @@
 
         <div class="dashboard-grid">
             <section class="data-panel">
-                <h2>模型比較</h2>
+                <h2>原始當期 ROA 模型比較</h2>
                 <div class="table-wrap">
                     <table>
                         <thead>

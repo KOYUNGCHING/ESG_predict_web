@@ -1,0 +1,20 @@
+[
+  {
+    "source": "知行合一期末報告＿機器學習的部分.ipynb",
+    "sha256": "e2b2bf3fa2e83192dc118aa9da11a84b6d3db5232e253a31fca9414eed5d7059",
+    "archive": "esg_financial_research.ipynb",
+    "note": "Outputs and execution metadata removed; original Colab cells retained as historical reference, not a run-all pipeline."
+  },
+  {
+    "source": "Esg_Greenwashing_Analyzer_template.ipynb",
+    "sha256": "0aac96a617929d7782bf104c068e8fe3cd60509f76e0e90104f99e2308294fe2",
+    "archive": "greenwashing_analyzer.ipynb",
+    "note": "Outputs and execution metadata removed; original Colab cells retained as historical reference, not a run-all pipeline."
+  },
+  {
+    "source": "ESG_期中.ipynb",
+    "sha256": "e2b2bf3fa2e83192dc118aa9da11a84b6d3db5232e253a31fca9414eed5d7059",
+    "archive": "esg_financial_research.ipynb",
+    "note": "All 81 cell sources are identical to the supplied final ML notebook; duplicate omitted."
+  }
+]

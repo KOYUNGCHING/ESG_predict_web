@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整研究分析｜地球股東會</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+<section class="dashboard-page"><div class="dashboard-container">
+    <a href="{{ url_for('dashboard') }}" class="back-link">← 模型成果儀表板</a>
+    <header class="dashboard-header">
+        <p class="eyebrow">Research &amp; Reproducibility</p>
+        <h1>完整研究分析</h1>
+        <p>從資料品質、相關性與規模差異，延伸到未來 ROA 預測、財務風險、分群及永續文本驗證。</p>
+    </header>
+    <nav class="research-nav" aria-label="研究章節">
+        <a href="#forecast">未來預測</a><a href="#eda">探索分析</a><a href="#regression">迴歸</a>
+        <a href="#risk">風險與分群</a><a href="#text">文本分析</a><a href="#report">期末報告</a>
+    </nav>
+    {% macro metrics(rows) %}
+    <div class="table-wrap"><table><thead><tr><th>模型</th><th>R²</th><th>RMSE</th><th>MAE</th></tr></thead><tbody>
+    {% for row in rows %}<tr><td>{{ row.Model }}</td><td>{{ '%.3f'|format(row.R2) }}</td><td>{{ '%.3f'|format(row.RMSE) }}</td><td>{{ '%.3f'|format(row.MAE) }}</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% endmacro %}
+    {% macro figure(file, caption) %}
+    {% set sizes = {'esg_scatter.png': (1934, 510), 'future_predictions.png': (2384, 509), 'clusters.png': (1034, 734), 'correlation.png': (1043, 883), 'size_distribution.png': (884, 584), 'future_model_comparison.png': (1935, 582), 'annual_trends.png': (1481, 585)} %}
+    <figure class="research-figure"><img src="{{ url_for('static', filename='images/analysis/' ~ file) }}" alt="{{ caption }}" width="{{ sizes[file][0] }}" height="{{ sizes[file][1] }}" loading="lazy"><figcaption>{{ caption }}</figcaption></figure>
+    {% endmacro %}
+    {% if research %}
+    <div class="overview-grid">
+        <div class="overview-card"><span>公司年度樣本</span><strong>{{ research.n_rows }}</strong></div>
+        <div class="overview-card"><span>公司數</span><strong>{{ research.n_companies }}</strong></div>
+        <div class="overview-card"><span>期間</span><strong>{{ research.year_min }}–{{ research.year_max }}</strong></div>
+        <div class="overview-card"><span>未來預測測試集</span><strong>{{ research.future_models[0].N_test }} 筆</strong></div>
+    </div>
+    <section id="forecast" class="data-panel research-section">
+        <p class="research-tag">本專案重新計算 · {{ research.split }} split</p><h2>五模型未來 ROA 預測</h2>
+        <p>以當期 ESG、E/S/G、市值與前一年 ROA 預測下一年 ROA。只使用相鄰年度；缺失特徵與目標的樣本不參與評估。</p>
+        <p>預設按時間保留最後一個可評估年度，並排除目標年度碰到測試年度的訓練資料。財報與永續報告實際公告日未提供，因此仍屬研究評估。</p>
+        {{ metrics(research.future_models) }}
+        {{ figure('future_model_comparison.png', '同一測試集的五模型比較；R² 越高、RMSE 與 MAE 越低通常越好。') }}
+        {{ figure('future_predictions.png', '下一期 ROA：實際值與預測值，虛線為完全準確的預測。') }}
+        <h3>未來預測模型的置換重要度</h3>
+        <p>在測試集打亂單一特徵後，Random Forest 的 MAE 平均增加量（重複 10 次）。數值越大代表這份測試資料對該特徵較敏感；負值代表打亂後誤差反而降低。這與模型內部重要度、SHAP 是不同指標。</p>
+        <div class="table-wrap"><table><thead><tr><th>特徵</th><th>MAE 增加量</th><th>重複試驗標準差</th></tr></thead><tbody>
+        {% for row in research.forecast_importance %}<tr><td>{{ row.Feature }}</td><td>{{ '%.4f'|format(row.Importance) }}</td><td>{{ '%.4f'|format(row.Std) }}</td></tr>{% endfor %}
+        </tbody></table></div>
+    </section>
+    <section id="eda" class="data-panel research-section"><h2>探索性資料分析</h2>
+        <p>年度平均由當年可用樣本計算；相關性採兩兩有效觀察值。重複公司年度觀察值與共同趨勢可能影響結果。</p>
+        {{ figure('correlation.png', 'ESG、E/S/G、公司規模與前後期 ROA 的 Pearson 相關係數。') }}
+        {{ figure('annual_trends.png', '年度 ESG 與 ROA 平均趨勢，分開呈現兩者尺度。') }}
+        {{ figure('esg_scatter.png', 'ESG 各構面與當期 ROA 的散佈情形。') }}
+        {{ figure('size_distribution.png', '依樣本市值中位數區分大小公司，比較 ROA 分布。') }}
+        <h3>高低 ROA 公司的 ESG 差異</h3>
+        <p>以 ROA 中位數 {{ '%.3f'|format(research.ttest.cutoff) }} 分組，低組 {{ research.ttest.n_low }} 筆、ESG 平均 {{ '%.2f'|format(research.ttest.mean_low) }}；高組 {{ research.ttest.n_high }} 筆、ESG 平均 {{ '%.2f'|format(research.ttest.mean_high) }}。</p>
+        <p>Welch 雙尾 t 檢定 p = {{ '%.3g'|format(research.ttest.p_value) }}。此檢定未校正公司內重複觀察值，只作探索性比較。</p>
+    </section>
+    <section id="regression" class="data-panel research-section"><h2>OLS 與公司規模異質性</h2>
+        <p>目標為當期 ROA；包含基礎模型、ESG × 大公司交互作用與大小公司分組。標準誤採 HC3；這些模型沒有公司固定效果，不能作因果推論。</p>
+        <div class="table-wrap"><table><thead><tr><th>模型</th><th>樣本</th><th>R²</th><th>調整 R²</th></tr></thead><tbody>
+        {% for row in research.ols_fits %}<tr><td>{{ row.Model }}</td><td>{{ row.N }}</td><td>{{ '%.3f'|format(row.R2) }}</td><td>{{ '%.3f'|format(row.Adjusted_R2) }}</td></tr>{% endfor %}
+        </tbody></table></div>
+        <details><summary>展開完整係數、p 值與信賴區間</summary><div class="table-wrap"><table><thead><tr><th>模型</th><th>變數</th><th>係數</th><th>p 值</th><th>95% CI</th></tr></thead><tbody>
+        {% for row in research.ols %}<tr><td>{{ row.Model }}</td><td>{{ row.Term }}</td><td>{{ '%.5f'|format(row.Coefficient) }}</td><td>{{ '%.4f'|format(row.P_value) }}</td><td>{{ '%.5f'|format(row.CI_low) }} ~ {{ '%.5f'|format(row.CI_high) }}</td></tr>{% endfor %}
+        </tbody></table></div></details>
+    </section>
+    <section id="risk" class="data-panel research-section"><h2>財務風險分類與 K-Means 分群</h2>
+        <p>重新計算的分類器以訓練資料下一年 ROA 的三分位數（{{ '%.3f'|format(research.risk.q1) }}、{{ '%.3f'|format(research.risk.q2) }}）定義 High／Medium／Low Risk。這是獲利相對強弱的研究代理指標，並非違約機率；定義與既有網站分類器未必相同。</p>
+        <p>本次測試 Accuracy：<strong>{{ '%.3f'|format(research.risk.accuracy) }}</strong></p>
+        <div class="table-wrap"><table><thead><tr><th>類別</th><th>Precision</th><th>Recall</th><th>F1</th><th>樣本</th></tr></thead><tbody>
+        {% for label in research.risk.labels %}{% set row = research.risk.report[label] %}<tr><td>{{ label }}</td><td>{{ '%.3f'|format(row.precision) }}</td><td>{{ '%.3f'|format(row.recall) }}</td><td>{{ '%.3f'|format(row['f1-score']) }}</td><td>{{ row.support|int }}</td></tr>{% endfor %}
+        </tbody></table></div>
+        <details><summary>展開分類混淆矩陣（列為實際、欄為預測）</summary><div class="table-wrap"><table><thead><tr><th>實際 / 預測</th>{% for label in research.risk.labels %}<th>{{ label }}</th>{% endfor %}</tr></thead><tbody>
+        {% for row in research.risk.confusion_matrix %}<tr><th>{{ research.risk.labels[loop.index0] }}</th>{% for value in row %}<td>{{ value }}</td>{% endfor %}</tr>{% endfor %}
+        </tbody></table></div></details>
+        <h3>公司分群概況</h3><p>以 ESG、E/S/G、市值、當期 ROA 與構面分數標準差進行標準化後分成四群，PCA 僅用於視覺化。群號是本次計算的編號，不對應舊模型的群號。</p>
+        <div class="table-wrap"><table><thead><tr><th>Cluster</th><th>樣本</th><th>ESG</th><th>市值</th><th>ROA</th></tr></thead><tbody>
+        {% for row in research.clusters %}<tr><td>{{ row.Cluster }}</td><td>{{ row.N }}</td><td>{{ '%.2f'|format(row['TESG分數']) }}</td><td>{{ '{:,.0f}'.format(row['市值_avg']) }}</td><td>{{ '%.3f'|format(row.ROA_avg) }}</td></tr>{% endfor %}
+        </tbody></table></div>{{ figure('clusters.png', '四群在前兩個主成分上的投影。') }}
+    </section>
+    <section id="text" class="data-panel research-section"><h2>漂綠文本分析與外部驗證</h2>
+        <p>已補入離線 PDF／TXT 分析程式：文字抽取、選用 OCR、切段、關鍵詞與 TF-IDF、multilingual zero-shot、四項分數、前五風險段落，以及人工標註抽樣和評估。網站仍使用事先分析好的 CSV。</p>
+        <p>段落風險門檻為 40／70；整份報告平均風險門檻為 30／60。分數是篩檢訊號，不代表已證實漂綠。</p>
+        <p>目前只確認彰銀與統一證的公司代碼對照。台新、富邦、國泰的銀行／金控範圍需確認後才能合併，避免將子公司報告當成母公司的報告。</p>
+        {% if research.external_validation %}<div class="table-wrap"><table><thead><tr><th>文本指標</th><th>有效樣本</th><th>與 TESG 相關</th><th>p 值</th></tr></thead><tbody>
+        {% for row in research.external_validation %}<tr><td>{{ row.Feature }}</td><td>{{ row.N }}</td><td>{{ '%.4f'|format(row.Correlation) }}</td><td>{{ '%.4f'|format(row.P_value) }}</td></tr>{% endfor %}
+        </tbody></table></div>{% endif %}
+        <p>Baseline 與加入文本特徵的比較：{% if research.text_comparison.status == 'completed' %}已完成，結果存於研究輸出表。{% else %}目前匹配 {{ research.text_comparison.matched_rows }} 筆，資料不足以完成可靠的五模型比較；程式已提供，待補足對照與資料後可重跑。{% endif %}</p>
+    </section>
+    {% else %}<section class="data-panel research-section"><h2>研究結果尚未產生</h2><p>請依 README 的研究分析步驟產生結果後再查看。</p></section>{% endif %}
+    {% if reported %}
+    <section id="report" class="data-panel research-section"><p class="research-tag">期末報告摘錄 · 非本次重新計算</p><h2>原報告結果與待補資料</h2>
+        <p>以下保留期末報告第 22 頁的未來 ROA 成績。切分方式與套件版本不完整，不能與本次時間切分的成績直接比較。</p>
+        {{ metrics(reported.future_models) }}
+        <h3>原報告的延伸迴歸</h3><p>第 12–18 頁分析 ROA、ROE、Tobin’s Q 與下一期 TESG。已補入含年度效果的重算程式；現有 CSV 缺少 ROE、Tobin’s Q 與原規模轉換定義，因此尚未重算。</p>
+        <div class="table-wrap"><table><thead><tr><th>報告頁</th><th>模型</th><th>調整 R²（報告）</th></tr></thead><tbody>{% for row in reported.regressions %}<tr><td>{{ row.Page }}</td><td>{{ row.Model }}</td><td>{{ row.Adjusted_R2 }}</td></tr>{% endfor %}</tbody></table></div>
+        <p>第 8 頁報告的漂綠風險與 TESG 相關係數為 −0.2945（p = 0.0002）；原始完整驗證樣本未提供。本頁上方的驗證僅使用目前能確認匹配的樣本。</p>
+        <p>第 23 頁財務風險 Accuracy 為 0.615。原始風險標籤建構、SHAP 數值與人工標註檔未提供，不能視為本次已重現的結果。</p>
+    </section>{% endif %}
+</div></section>
+</body></html>

@@ -208,3 +208,14 @@ th {
         grid-template-columns: 1fr;
     }
 }
+
+.research-section, .research-intro { margin: 0 0 28px; scroll-margin-top: 24px; }
+.research-section p, .research-intro p { line-height: 1.9; margin: 12px 0; overflow-wrap: anywhere; }
+.research-section h3 { margin-top: 24px; }
+.research-nav { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.research-nav a { background: var(--cloud); border: 2px solid var(--ink); border-radius: 6px; padding: 10px 16px; color: var(--ink); font-weight: 800; }
+.research-figure { margin: 24px 0; }
+.research-figure img { display: block; width: 100%; height: auto; border-radius: 4px; }
+.research-figure figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.7; }
+.research-tag { color: var(--earth-green-dark); font-weight: 800; }
+.research-section summary { cursor: pointer; font-weight: 800; padding: 18px 0; }

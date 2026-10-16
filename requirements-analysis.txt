@@ -1,0 +1,6 @@
+-r requirements.txt
+statsmodels>=0.14,<0.16
+matplotlib>=3.9,<4
+lightgbm>=4,<5
+openpyxl>=3.1,<4
+tqdm>=4.66,<5

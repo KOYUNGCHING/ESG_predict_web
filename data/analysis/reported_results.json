@@ -1,0 +1,30 @@
+{
+  "source": "期末報告.pdf",
+  "status": "Report transcription; not recomputed or independently validated",
+  "future_models_page": 22,
+  "future_models": [
+    {"Model": "LightGBM", "R2": 0.467, "RMSE": 1.246, "MAE": 0.598},
+    {"Model": "Random Forest", "R2": 0.445, "RMSE": 1.272, "MAE": 0.566},
+    {"Model": "XGBoost", "R2": 0.396, "RMSE": 1.327, "MAE": 0.567},
+    {"Model": "Linear Regression", "R2": 0.264, "RMSE": 1.464, "MAE": 0.723},
+    {"Model": "SVM", "R2": 0.239, "RMSE": 1.489, "MAE": 0.635}
+  ],
+  "external_validation_page": 8,
+  "external_validation": [
+    {"Feature": "commitment", "Correlation": 0.0689, "P_value": 0.3961},
+    {"Feature": "evidence", "Correlation": 0.0558, "P_value": 0.4921},
+    {"Feature": "credibility", "Correlation": 0.1301, "P_value": 0.1078},
+    {"Feature": "greenrisk", "Correlation": -0.2945, "P_value": 0.0002}
+  ],
+  "risk_page": 23,
+  "risk_accuracy": 0.615,
+  "risk_f1": {"High Risk": 0.76, "Medium Risk": 0.43, "Low Risk": 0.62},
+  "regressions": [
+    {"Page": 12, "Model": "ROA A", "Adjusted_R2": 0.5175, "Finding": "TESG is not significant after controls and year effects."},
+    {"Page": 14, "Model": "ROE", "Adjusted_R2": 0.1908, "Finding": "TESG is not significant; current ROE and Tobin Q are positively associated with future ROE."},
+    {"Page": 15, "Model": "Tobin Q", "Adjusted_R2": 0.9797, "Finding": "TESG is not significant; current Tobin Q is persistent."},
+    {"Page": 16, "Model": "TESG A", "Adjusted_R2": 0.7241, "Finding": "Current TESG and company size are positively associated with future TESG."},
+    {"Page": 17, "Model": "TESG B", "Adjusted_R2": 0.7229, "Finding": "ROA and Tobin Q add limited explanatory power."}
+  ],
+  "missing_inputs": ["Original ROE / Tobin Q / size-transformation panel and regression scripts", "Original risk-label construction and exact final training split", "Human-labeled paragraph validation workbook", "Exact report-to-company mapping for financial holding groups versus subsidiaries", "Original SHAP values and fitted explainer"]
+}

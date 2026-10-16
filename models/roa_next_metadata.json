@@ -1,0 +1,27 @@
+{
+  "target": "ROA_next",
+  "estimator": "RandomForestRegressor",
+  "features": [
+    "TESG分數",
+    "環境構面分數",
+    "社會構面分數",
+    "公司治理構面分數",
+    "市值_avg",
+    "ROA_lag"
+  ],
+  "n_fit": 194,
+  "source_sha256": "cdf0abf9a09c48c7c8339c5e1e49e6601b475c177e1f2f8022632af93960717e",
+  "sklearn_version": "1.6.1",
+  "seed": 42,
+  "evaluation": {
+    "Model": "Random Forest",
+    "Target": "ROA_next",
+    "Split": "time",
+    "N_train": 117,
+    "N_test": 36,
+    "R2": 0.6922332253263042,
+    "RMSE": 0.7029776667331776,
+    "MAE": 0.43208031512870115
+  },
+  "note": "Deployment refit on all complete adjacent-year pairs; evaluation used a separate held-out fit."
+}

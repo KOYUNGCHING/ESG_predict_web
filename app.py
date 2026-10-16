@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import os
+import json
 import numpy as np
 import pandas as pd
 import joblib
@@ -21,7 +22,8 @@ os.makedirs(MODEL_FOLDER, exist_ok=True)
 os.makedirs(DATA_FOLDER, exist_ok=True)
 
 # ML 模型路徑
-ROA_MODEL_PATH = os.path.join(MODEL_FOLDER, "roa_prediction_model.joblib")
+ROA_MODEL_PATH = os.path.join(MODEL_FOLDER, "roa_next_model.joblib")
+ROA_METADATA_PATH = os.path.join(MODEL_FOLDER, "roa_next_metadata.json")
 RISK_MODEL_PATH = os.path.join(MODEL_FOLDER, "financial_risk_classifier.pkl")
 RISK_FEATURES_PATH = os.path.join(MODEL_FOLDER, "financial_risk_features.pkl")
 KMEANS_MODEL_PATH = os.path.join(MODEL_FOLDER, "kmeans_cluster_model.pkl")
@@ -30,8 +32,7 @@ CLUSTER_FEATURES_PATH = os.path.join(MODEL_FOLDER, "cluster_features.pkl")
 CLUSTER_NAMES_PATH = os.path.join(MODEL_FOLDER, "cluster_names.pkl")
 GREEN_REF_PATH = os.path.join(MODEL_FOLDER, "greenwashing_reference.pkl")
 FEATURES_PATHS = [
-    os.path.join(MODEL_FOLDER, "model_features.pkl"),
-    os.path.join(MODEL_FOLDER, "model_features.joblib"),
+    os.path.join(MODEL_FOLDER, "roa_next_features.joblib"),
 ]
 DATA_FILES = {
     "model_results": os.path.join(DATA_FOLDER, "model_results_summary.csv"),
@@ -73,8 +74,8 @@ def load_roa_prediction_model():
 
         if not os.path.exists(ROA_MODEL_PATH):
             raise FileNotFoundError(
-                "找不到 models/roa_prediction_model.joblib。"
-                "請先把 Colab 下載的模型檔放到 models 資料夾。"
+                "找不到 models/roa_next_model.joblib。"
+                "請執行 python -m analysis.research --export-forecast 建立下一期模型。"
             )
 
         features_path = next(
@@ -84,16 +85,24 @@ def load_roa_prediction_model():
 
         if features_path is None:
             raise FileNotFoundError(
-                "找不到 models/model_features.pkl 或 models/model_features.joblib。"
-                "請先把特徵列表檔放到 models 資料夾。"
+                "找不到 models/roa_next_features.joblib。"
+                "請執行 python -m analysis.research --export-forecast 建立特徵清單。"
             )
 
-        roa_model = joblib.load(ROA_MODEL_PATH)
-        roa_features = joblib.load(features_path)
+        with open(ROA_METADATA_PATH, encoding="utf-8") as stream:
+            metadata = json.load(stream)
+        loaded_model = joblib.load(ROA_MODEL_PATH)
+        loaded_features = joblib.load(features_path)
+        if metadata.get("target") != "ROA_next" or metadata.get("features") != list(loaded_features):
+            raise ValueError("ROA 模型訓練目標或特徵資訊不一致，請重新匯出下一期模型。")
+        if list(getattr(loaded_model, "feature_names_in_", [])) != list(loaded_features):
+            raise ValueError("ROA 模型實際特徵與儲存的特徵清單不一致。")
+        roa_model = loaded_model
+        roa_features = loaded_features
 
         if not hasattr(roa_model, "predict"):
             raise TypeError(
-                "models/roa_prediction_model.joblib 不是可預測的模型物件。"
+                "models/roa_next_model.joblib 不是可預測的模型物件。"
                 "目前讀到的內容沒有 predict() 方法，請確認這個檔案是訓練好的模型，"
                 "不是特徵列表。"
             )
@@ -372,12 +381,16 @@ def get_reference_metrics():
 
 def get_feature_importance_rows(limit=5):
     """
-    讀取 Random Forest 特徵重要度，提供 ROA 預測理由使用。
+    讀取本次載入的 ROA 預測模型重要度，避免混用當期研究模型。
     """
-    importance_df = read_csv_if_exists(DATA_FILES["feature_importance"])
-    if importance_df is None or importance_df.empty:
+    # Explain the actual loaded forecast artifact, not the legacy current-ROA model.
+    if roa_model is None or not hasattr(roa_model, "feature_importances_"):
         return []
-
+    features = get_model_features(roa_model, roa_features)
+    importance_df = pd.DataFrame({
+        "Feature": features,
+        "Importance": roa_model.feature_importances_,
+    }).sort_values("Importance", ascending=False)
     rows = importance_df.head(limit).to_dict(orient="records")
     return [
         {
@@ -815,6 +828,22 @@ def dashboard():
     """
     dashboard_data = build_dashboard_data()
     return render_template("dashboard.html", dashboard=dashboard_data)
+
+
+@app.route("/research")
+def research():
+    """Serve precomputed research results without loading offline analysis dependencies."""
+    def read_analysis_json(filename):
+        path = os.path.join(DATA_FOLDER, "analysis", filename)
+        if not os.path.exists(path):
+            return None
+        with open(path, encoding="utf-8") as stream:
+            return json.load(stream)
+    return render_template(
+        "research.html",
+        research=read_analysis_json("summary.json"),
+        reported=read_analysis_json("reported_results.json"),
+    )
 
 
 @app.route("/ml-prediction", methods=["GET", "POST"])

@@ -1,0 +1,560 @@
+{
+  "source_sha256": "cdf0abf9a09c48c7c8339c5e1e49e6601b475c177e1f2f8022632af93960717e",
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "sklearn": "1.6.1",
+    "scipy": "1.17.1",
+    "xgboost": "3.2.0",
+    "lightgbm": "4.7.0",
+    "statsmodels": "0.15.0"
+  },
+  "seed": 42,
+  "split": "time",
+  "n_rows": 284,
+  "n_companies": 41,
+  "year_min": 2016,
+  "year_max": 2022,
+  "size_cutoff": 24847974.125,
+  "future_models": [
+    {
+      "Model": "Linear Regression",
+      "Target": "ROA_next",
+      "Split": "time",
+      "N_train": 117,
+      "N_test": 36,
+      "R2": 0.6232555790614205,
+      "RMSE": 0.7777751730567118,
+      "MAE": 0.4807962861459678
+    },
+    {
+      "Model": "Random Forest",
+      "Target": "ROA_next",
+      "Split": "time",
+      "N_train": 117,
+      "N_test": 36,
+      "R2": 0.6922332253263042,
+      "RMSE": 0.7029776667331776,
+      "MAE": 0.43208031512870115
+    },
+    {
+      "Model": "XGBoost",
+      "Target": "ROA_next",
+      "Split": "time",
+      "N_train": 117,
+      "N_test": 36,
+      "R2": 0.8088726322143274,
+      "RMSE": 0.5539774675844309,
+      "MAE": 0.3192699275083013
+    },
+    {
+      "Model": "LightGBM",
+      "Target": "ROA_next",
+      "Split": "time",
+      "N_train": 117,
+      "N_test": 36,
+      "R2": 0.4452989824568364,
+      "RMSE": 0.943756905853191,
+      "MAE": 0.528632075563234
+    },
+    {
+      "Model": "SVM",
+      "Target": "ROA_next",
+      "Split": "time",
+      "N_train": 117,
+      "N_test": 36,
+      "R2": 0.5465342288638628,
+      "RMSE": 0.8533023009500876,
+      "MAE": 0.5237378370358416
+    }
+  ],
+  "current_models": [
+    {
+      "Model": "Linear Regression",
+      "Target": "ROA_avg",
+      "Split": "random",
+      "N_train": 221,
+      "N_test": 56,
+      "R2": 0.22571875175564082,
+      "RMSE": 1.600205338292684,
+      "MAE": 1.0349985093754108
+    },
+    {
+      "Model": "Random Forest",
+      "Target": "ROA_avg",
+      "Split": "random",
+      "N_train": 221,
+      "N_test": 56,
+      "R2": 0.817853314101523,
+      "RMSE": 0.7761344862482586,
+      "MAE": 0.476797841194302
+    },
+    {
+      "Model": "XGBoost",
+      "Target": "ROA_avg",
+      "Split": "random",
+      "N_train": 221,
+      "N_test": 56,
+      "R2": 0.8400149493860466,
+      "RMSE": 0.7273878552641119,
+      "MAE": 0.488587190118574
+    },
+    {
+      "Model": "LightGBM",
+      "Target": "ROA_avg",
+      "Split": "random",
+      "N_train": 221,
+      "N_test": 56,
+      "R2": 0.6375103078554034,
+      "RMSE": 1.0948992916599343,
+      "MAE": 0.6660732378310669
+    },
+    {
+      "Model": "SVM",
+      "Target": "ROA_avg",
+      "Split": "random",
+      "N_train": 221,
+      "N_test": 56,
+      "R2": 0.13604820970452802,
+      "RMSE": 1.6903284399652414,
+      "MAE": 0.8659114670554838
+    }
+  ],
+  "forecast_importance": [
+    {
+      "Feature": "ROA_lag",
+      "Importance": 0.45383893122644636,
+      "Std": 0.11814457832382479
+    },
+    {
+      "Feature": "市值_avg",
+      "Importance": 0.20369631351824422,
+      "Std": 0.036133544503893174
+    },
+    {
+      "Feature": "社會構面分數",
+      "Importance": 0.009926347521788925,
+      "Std": 0.005346675048886136
+    },
+    {
+      "Feature": "TESG分數",
+      "Importance": 0.006457982852098437,
+      "Std": 0.002966371177941328
+    },
+    {
+      "Feature": "公司治理構面分數",
+      "Importance": -0.000720582992460006,
+      "Std": 0.0038983588292118483
+    },
+    {
+      "Feature": "環境構面分數",
+      "Importance": -0.0018244621401549755,
+      "Std": 0.0010918901538837368
+    }
+  ],
+  "ols": [
+    {
+      "Model": "Baseline",
+      "Term": "const",
+      "Coefficient": 5.010273166296776,
+      "Std_error": 0.7707032099257132,
+      "P_value": 7.983492413681038e-11,
+      "CI_low": 3.4997226320729657,
+      "CI_high": 6.5208237005205865
+    },
+    {
+      "Model": "Baseline",
+      "Term": "TESG分數",
+      "Coefficient": 0.051350695832660734,
+      "Std_error": 0.036494711623295456,
+      "P_value": 0.15940596709810262,
+      "CI_low": -0.02017762457517365,
+      "CI_high": 0.12287901624049512
+    },
+    {
+      "Model": "Baseline",
+      "Term": "環境構面分數",
+      "Coefficient": -0.005087667519507117,
+      "Std_error": 0.008316233585203048,
+      "P_value": 0.5406863365640692,
+      "CI_low": -0.0213871858335275,
+      "CI_high": 0.011211850794513268
+    },
+    {
+      "Model": "Baseline",
+      "Term": "社會構面分數",
+      "Coefficient": -0.07069102298591091,
+      "Std_error": 0.019101531833862886,
+      "P_value": 0.00021491754310913193,
+      "CI_low": -0.1081293374298275,
+      "CI_high": -0.03325270854199432
+    },
+    {
+      "Model": "Baseline",
+      "Term": "公司治理構面分數",
+      "Coefficient": -0.03377701294195157,
+      "Std_error": 0.016546440114885975,
+      "P_value": 0.04121642621853708,
+      "CI_low": -0.06620743963947687,
+      "CI_high": -0.0013465862444262608
+    },
+    {
+      "Model": "Baseline",
+      "Term": "市值_avg",
+      "Coefficient": -1.7367977592251038e-09,
+      "Std_error": 4.624204747351801e-10,
+      "P_value": 0.00017273054623806987,
+      "CI_low": -2.643125235419971e-09,
+      "CI_high": -8.304702830302368e-10
+    },
+    {
+      "Model": "ESG x Large",
+      "Term": "const",
+      "Coefficient": 8.140468160525629,
+      "Std_error": 1.5512944709320846,
+      "P_value": 1.5414985856594274e-07,
+      "CI_low": 5.099986868082625,
+      "CI_high": 11.180949452968633
+    },
+    {
+      "Model": "ESG x Large",
+      "Term": "TESG分數",
+      "Coefficient": -0.10816421774636858,
+      "Std_error": 0.026279748170721012,
+      "P_value": 3.85709545119798e-05,
+      "CI_low": -0.15967157768376414,
+      "CI_high": -0.05665685780897303
+    },
+    {
+      "Model": "ESG x Large",
+      "Term": "市值_avg",
+      "Coefficient": 2.5625126244182512e-11,
+      "Std_error": 1.7773311337878117e-10,
+      "P_value": 0.885360261979507,
+      "CI_low": -3.227253748384026e-10,
+      "CI_high": 3.7397562732676765e-10
+    },
+    {
+      "Model": "ESG x Large",
+      "Term": "Large_Firm",
+      "Coefficient": -7.376458116075147,
+      "Std_error": 1.5586847309089022,
+      "P_value": 2.2178348652949054e-06,
+      "CI_low": -10.4314240519091,
+      "CI_high": -4.321492180241194
+    },
+    {
+      "Model": "ESG x Large",
+      "Term": "ESG_x_Large",
+      "Coefficient": 0.10302232586501221,
+      "Std_error": 0.026403646350708215,
+      "P_value": 9.547138881855574e-05,
+      "CI_low": 0.05127212995709168,
+      "CI_high": 0.15477252177293274
+    },
+    {
+      "Model": "Small firms",
+      "Term": "const",
+      "Coefficient": 5.041656878944995,
+      "Std_error": 1.4429410374234137,
+      "P_value": 0.0004758152097527346,
+      "CI_low": 2.2135444137802414,
+      "CI_high": 7.8697693441097485
+    },
+    {
+      "Model": "Small firms",
+      "Term": "TESG分數",
+      "Coefficient": 0.3348928948264077,
+      "Std_error": 0.08689962586161126,
+      "P_value": 0.0001163034381291759,
+      "CI_low": 0.16457275786764416,
+      "CI_high": 0.5052130317851713
+    },
+    {
+      "Model": "Small firms",
+      "Term": "環境構面分數",
+      "Coefficient": -0.01712157009315064,
+      "Std_error": 0.01735234121574834,
+      "P_value": 0.3237893057312097,
+      "CI_low": -0.051131533923467365,
+      "CI_high": 0.016888393737166083
+    },
+    {
+      "Model": "Small firms",
+      "Term": "社會構面分數",
+      "Coefficient": -0.18349891325134243,
+      "Std_error": 0.03728300746288659,
+      "P_value": 8.575879435658856e-07,
+      "CI_low": -0.2565722651139382,
+      "CI_high": -0.11042556138874667
+    },
+    {
+      "Model": "Small firms",
+      "Term": "公司治理構面分數",
+      "Coefficient": -0.16311748219060496,
+      "Std_error": 0.03499423152832619,
+      "P_value": 3.14267594052546e-06,
+      "CI_low": -0.23170491565278034,
+      "CI_high": -0.09453004872842957
+    },
+    {
+      "Model": "Small firms",
+      "Term": "市值_avg",
+      "Coefficient": -1.288862691251255e-07,
+      "Std_error": 2.1938428216818145e-08,
+      "P_value": 4.230757182329251e-09,
+      "CI_low": -1.7188479830750635e-07,
+      "CI_high": -8.588773994274467e-08
+    },
+    {
+      "Model": "Large firms",
+      "Term": "const",
+      "Coefficient": 0.833903830628455,
+      "Std_error": 0.13317278666495044,
+      "P_value": 3.8051346809586447e-10,
+      "CI_low": 0.5728899650443161,
+      "CI_high": 1.094917696212594
+    },
+    {
+      "Model": "Large firms",
+      "Term": "TESG分數",
+      "Coefficient": 0.002785386512706665,
+      "Std_error": 0.006590176016828469,
+      "P_value": 0.6725452572727215,
+      "CI_low": -0.010131121132056763,
+      "CI_high": 0.015701894157470093
+    },
+    {
+      "Model": "Large firms",
+      "Term": "環境構面分數",
+      "Coefficient": 0.0004233206750021036,
+      "Std_error": 0.001726471772337095,
+      "P_value": 0.8063061523004338,
+      "CI_low": -0.0029605018191036377,
+      "CI_high": 0.003807143169107845
+    },
+    {
+      "Model": "Large firms",
+      "Term": "社會構面分數",
+      "Coefficient": -0.003024524292107553,
+      "Std_error": 0.0029250092309880326,
+      "P_value": 0.3011258150287557,
+      "CI_low": -0.008757437039291296,
+      "CI_high": 0.00270838845507619
+    },
+    {
+      "Model": "Large firms",
+      "Term": "公司治理構面分數",
+      "Coefficient": -0.00717491084752517,
+      "Std_error": 0.003333755544107945,
+      "P_value": 0.03138155451052633,
+      "CI_low": -0.013708951647237474,
+      "CI_high": -0.0006408700478128665
+    },
+    {
+      "Model": "Large firms",
+      "Term": "市值_avg",
+      "Coefficient": 1.7893895337262112e-10,
+      "Std_error": 1.7952718246872824e-10,
+      "P_value": 0.3188987620816963,
+      "CI_low": -1.729278585120368e-10,
+      "CI_high": 5.30805765257279e-10
+    }
+  ],
+  "ols_fits": [
+    {
+      "Model": "Baseline",
+      "N": 277,
+      "R2": 0.19852161686446568,
+      "Adjusted_R2": 0.1837341928213747,
+      "Covariance": "HC3"
+    },
+    {
+      "Model": "ESG x Large",
+      "N": 277,
+      "R2": 0.30556725600286105,
+      "Adjusted_R2": 0.2953550097676091,
+      "Covariance": "HC3"
+    },
+    {
+      "Model": "Small firms",
+      "N": 135,
+      "R2": 0.2841060205508822,
+      "Adjusted_R2": 0.2563581918900636,
+      "Covariance": "HC3"
+    },
+    {
+      "Model": "Large firms",
+      "N": 142,
+      "R2": 0.05701148024924507,
+      "Adjusted_R2": 0.022342784670173144,
+      "Covariance": "HC3"
+    }
+  ],
+  "ttest": {
+    "test": "Welch two-sided; ROA median split",
+    "cutoff": 0.5175,
+    "n_low": 140,
+    "n_high": 137,
+    "mean_low": 61.5337142857143,
+    "mean_high": 55.80905109489051,
+    "statistic": 6.9959474894826155,
+    "p_value": 2.0257087040526045e-11
+  },
+  "risk": {
+    "definition": "Training-set tertiles of ROA_next; research proxy, not default probability",
+    "q1": 0.4083333333333333,
+    "q2": 0.8169444444444443,
+    "n_train": 117,
+    "n_test": 36,
+    "accuracy": 0.5555555555555556,
+    "report": {
+      "High Risk": {
+        "precision": 0.6923076923076923,
+        "recall": 0.5294117647058824,
+        "f1-score": 0.6,
+        "support": 17.0
+      },
+      "Medium Risk": {
+        "precision": 0.3333333333333333,
+        "recall": 0.2727272727272727,
+        "f1-score": 0.3,
+        "support": 11.0
+      },
+      "Low Risk": {
+        "precision": 0.5714285714285714,
+        "recall": 1.0,
+        "f1-score": 0.7272727272727273,
+        "support": 8.0
+      },
+      "accuracy": 0.5555555555555556,
+      "macro avg": {
+        "precision": 0.5323565323565324,
+        "recall": 0.6007130124777184,
+        "f1-score": 0.5424242424242424,
+        "support": 36.0
+      },
+      "weighted avg": {
+        "precision": 0.5557590557590557,
+        "recall": 0.5555555555555556,
+        "f1-score": 0.5366161616161617,
+        "support": 36.0
+      }
+    },
+    "labels": [
+      "High Risk",
+      "Medium Risk",
+      "Low Risk"
+    ],
+    "confusion_matrix": [
+      [
+        9,
+        6,
+        2
+      ],
+      [
+        4,
+        3,
+        4
+      ],
+      [
+        0,
+        0,
+        8
+      ]
+    ]
+  },
+  "clusters": [
+    {
+      "Cluster": 0,
+      "TESG分數": 66.59175,
+      "環境構面分數": 71.08250000000001,
+      "社會構面分數": 72.392875,
+      "公司治理構面分數": 61.919375,
+      "市值_avg": 294674902.56875,
+      "ROA_avg": 0.4179479166666667,
+      "ESG_balance_risk": 7.64521841709638,
+      "N": 80
+    },
+    {
+      "Cluster": 1,
+      "TESG分數": 58.5669,
+      "環境構面分數": 61.2729,
+      "社會構面分數": 59.8722,
+      "公司治理構面分數": 57.0471,
+      "市值_avg": 28191217.6075,
+      "ROA_avg": 1.104525,
+      "ESG_balance_risk": 5.433972133655227,
+      "N": 100
+    },
+    {
+      "Cluster": 2,
+      "TESG分數": 52.396962025316455,
+      "環境構面分數": 47.19822784810126,
+      "社會構面分數": 55.08746835443038,
+      "公司治理構面分數": 51.93164556962026,
+      "市值_avg": 57293768.63607595,
+      "ROA_avg": 1.0450000000000002,
+      "ESG_balance_risk": 12.091693988749464,
+      "N": 79
+    },
+    {
+      "Cluster": 3,
+      "TESG分數": 52.065,
+      "環境構面分數": 50.94555555555556,
+      "社會構面分數": 47.327777777777776,
+      "公司治理構面分數": 56.68611111111111,
+      "市值_avg": 2235017.050925926,
+      "ROA_avg": 6.962916666666667,
+      "ESG_balance_risk": 5.953303458018781,
+      "N": 18
+    }
+  ],
+  "pca_variance": [
+    0.4161574711106123,
+    0.1869713301132081
+  ],
+  "external_validation": [
+    {
+      "Feature": "avg_commitment_score",
+      "N": 14,
+      "Correlation": 0.47906592821606114,
+      "P_value": 0.08306271510516412
+    },
+    {
+      "Feature": "avg_evidence_score",
+      "N": 14,
+      "Correlation": 0.688047758394399,
+      "P_value": 0.006525158214324452
+    },
+    {
+      "Feature": "avg_credibility_score",
+      "N": 14,
+      "Correlation": 0.7066284259340255,
+      "P_value": 0.004722208177791084
+    },
+    {
+      "Feature": "overall_greenwashing_risk_score",
+      "N": 14,
+      "Correlation": -0.5325693193522907,
+      "P_value": 0.04992001884381213
+    }
+  ],
+  "text_comparison": {
+    "status": "insufficient_matched_data",
+    "matched_rows": 14,
+    "companies": [
+      "彰銀",
+      "統一證"
+    ]
+  },
+  "notes": [
+    "ROA_next uses adjacent calendar years only.",
+    "Time split purges training targets in the first test feature year.",
+    "ROA observed at t+1 is not necessarily disclosed at t+1; publication dates unavailable.",
+    "OLS uses HC3 standard errors; observational associations are not causal.",
+    "Risk classifier and clusters are new research runs; deployed models are unchanged.",
+    "Text report-year matches do not establish availability at forecast time.",
+    "Repeated company-years make simple Pearson p-values exploratory."
+  ]
+}
